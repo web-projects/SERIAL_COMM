@@ -22,10 +22,10 @@ namespace SERIAL_COMM.Connection
         private ResponseBytesHandlerDelegate ResponseBytesHandler;
         public delegate void ResponseBytesHandlerDelegate(byte[] msg);
 
-        private bool LastCDHolding;
+        private bool lastCDHolding;
         private bool connected;
-        private string COMMPort;
-        private static string[] SerialPorts;
+        private string commPort;
+        private static string[] serialPorts;
         private static ManagementEventWatcher arrival;
         private static ManagementEventWatcher removal;
 
@@ -94,8 +94,8 @@ namespace SERIAL_COMM.Connection
 
         public SerialConnection(string port)
         {
-            COMMPort = port;
-            SerialPorts = GetAvailableSerialPorts();
+            commPort = port;
+            serialPorts = GetAvailableSerialPorts();
             MonitorDeviceChanges();
         }
 
@@ -107,7 +107,7 @@ namespace SERIAL_COMM.Connection
                 readThread = new Thread(ReadResponseBytes);
 
                 // Create a new SerialPort object with default settings.
-                serialPort = new System.IO.Ports.SerialPort(COMMPort);
+                serialPort = new System.IO.Ports.SerialPort(commPort);
 
                 // Update the Handshake
                 serialPort.Handshake = System.IO.Ports.Handshake.None;
@@ -121,7 +121,7 @@ namespace SERIAL_COMM.Connection
 
                 // monitor port changes
                 PortsChanged += OnPortsChanged;
-                LastCDHolding = serialPort.CDHolding;
+                lastCDHolding = serialPort.CDHolding;
 
                 // discard any buffered bytes
                 serialPort.DiscardInBuffer();
@@ -150,7 +150,7 @@ namespace SERIAL_COMM.Connection
             {
                 case EventType.Removal:
                 {
-                    if (e.SerialPorts.Contains(COMMPort) == true)
+                    if (e.SerialPorts.Contains(commPort) == true)
                     {
                         readContinue = false;
                         connected = false;
@@ -193,7 +193,7 @@ namespace SERIAL_COMM.Connection
 
         public bool Connected()
         {
-            if(LastCDHolding != serialPort.CDHolding)
+            if (lastCDHolding != serialPort.CDHolding)
             {
                 connected = false;
                 Dispose();
@@ -249,32 +249,28 @@ namespace SERIAL_COMM.Connection
 
         private static void RaisePortsChangedIfNecessary(EventType eventType)
         {
-            lock (SerialPorts)
+            lock (serialPorts)
             {
                 var availableSerialPorts = GetAvailableSerialPorts();
-                //IEnumerable<string> uniqueItems = availableSerialPorts.Distinct<string>();
 
                 if (eventType == EventType.Insertion)
                 {
-                    if (!SerialPorts.SequenceEqual(availableSerialPorts))
+                    if (!serialPorts.SequenceEqual(availableSerialPorts))
                     {
-                        var added = availableSerialPorts.Except(SerialPorts).ToArray();
+                        var added = availableSerialPorts.Except(serialPorts).ToArray();
                         if (added.Length > 0)
                         {
-                            SerialPorts = added;
+                            serialPorts = availableSerialPorts;
                         }
                         PortsChanged.Raise(null, new PortsChangedArgs(eventType, added));
                     }
                 }
                 else if (eventType == EventType.Removal)
                 {
-                    if (SerialPorts.SequenceEqual(availableSerialPorts))
+                    var removed = serialPorts.Except(availableSerialPorts).ToArray();
+                    if (removed.Length > 0)
                     {
-                        var removed = SerialPorts.Except(availableSerialPorts).ToArray();
-                        if (removed.Length > 0)
-                        {
-                            SerialPorts = removed;
-                        }
+                        serialPorts = availableSerialPorts;
                         PortsChanged.Raise(null, new PortsChangedArgs(eventType, removed));
                     }
                 }
