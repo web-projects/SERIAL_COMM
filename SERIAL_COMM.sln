@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SERIAL_COMM", "SERIAL_COMM\SERIAL_COMM.csproj", "{17B2930D-4E85-4EBE-86A8-EC1181E3D04E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17B2930D-4E85-4EBE-86A8-EC1181E3D04E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B2930D-4E85-4EBE-86A8-EC1181E3D04E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B2930D-4E85-4EBE-86A8-EC1181E3D04E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17B2930D-4E85-4EBE-86A8-EC1181E3D04E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F2403143-76A4-4D56-A899-F3B2BDA5E0A7}
+	EndGlobalSection
+EndGlobal
