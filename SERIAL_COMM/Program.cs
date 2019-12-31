@@ -10,7 +10,7 @@ namespace SERIAL_COMM
         {
             Console.WriteLine("main: connecting...");
 
-            SerialConnection connection = new SerialConnection("COM3");
+            SerialConnection connection = new SerialConnection("COM11");
 
             if (connection.Connect())
             {

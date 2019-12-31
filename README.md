@@ -31,4 +31,5 @@ This an applicationto test Serial Communication.
 ### HISTORY ###
 
 * 20191230 - Initial repository
+* 20191231 - Cleaned up port detection logic.
            

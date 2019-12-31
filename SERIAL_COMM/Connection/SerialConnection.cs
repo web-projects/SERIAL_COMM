@@ -22,6 +22,7 @@ namespace SERIAL_COMM.Connection
         private ResponseBytesHandlerDelegate ResponseBytesHandler;
         public delegate void ResponseBytesHandlerDelegate(byte[] msg);
 
+        private bool LastCDHolding;
         private bool connected;
         private string COMMPort;
         private static string[] SerialPorts;
@@ -120,6 +121,7 @@ namespace SERIAL_COMM.Connection
 
                 // monitor port changes
                 PortsChanged += OnPortsChanged;
+                LastCDHolding = serialPort.CDHolding;
 
                 // discard any buffered bytes
                 serialPort.DiscardInBuffer();
@@ -148,7 +150,7 @@ namespace SERIAL_COMM.Connection
             {
                 case EventType.Removal:
                 {
-                    if (e.SerialPorts.Contains(COMMPort) == false)
+                    if (e.SerialPorts.Contains(COMMPort) == true)
                     {
                         readContinue = false;
                         connected = false;
@@ -191,6 +193,12 @@ namespace SERIAL_COMM.Connection
 
         public bool Connected()
         {
+            if(LastCDHolding != serialPort.CDHolding)
+            {
+                connected = false;
+                Dispose();
+            }
+
             return connected;
         }
 
@@ -244,23 +252,29 @@ namespace SERIAL_COMM.Connection
             lock (SerialPorts)
             {
                 var availableSerialPorts = GetAvailableSerialPorts();
-                IEnumerable<string> uniqueItems = availableSerialPorts.Distinct<string>();
+                //IEnumerable<string> uniqueItems = availableSerialPorts.Distinct<string>();
 
                 if (eventType == EventType.Insertion)
                 {
-                    if (!SerialPorts.SequenceEqual(uniqueItems))
+                    if (!SerialPorts.SequenceEqual(availableSerialPorts))
                     {
-                        var added = uniqueItems.Except(SerialPorts).ToArray();
-                        SerialPorts = added;
+                        var added = availableSerialPorts.Except(SerialPorts).ToArray();
+                        if (added.Length > 0)
+                        {
+                            SerialPorts = added;
+                        }
                         PortsChanged.Raise(null, new PortsChangedArgs(eventType, added));
                     }
                 }
                 else if (eventType == EventType.Removal)
                 {
-                    if (SerialPorts.SequenceEqual(uniqueItems))
+                    if (SerialPorts.SequenceEqual(availableSerialPorts))
                     {
-                        var removed = SerialPorts.Except(uniqueItems).ToArray();
-                        SerialPorts = removed;
+                        var removed = SerialPorts.Except(availableSerialPorts).ToArray();
+                        if (removed.Length > 0)
+                        {
+                            SerialPorts = removed;
+                        }
                         PortsChanged.Raise(null, new PortsChangedArgs(eventType, removed));
                     }
                 }
