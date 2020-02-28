@@ -1,6 +1,8 @@
 ﻿using Ninject;
 using SERIAL_COMM.Cancellation;
 using SERIAL_COMM.CommandLayer.Extensions;
+using SERIAL_COMM.CommandLayer.Helpers;
+using SERIAL_COMM.CommandLayer.VIPA;
 using SERIAL_COMM.Connection;
 using SERIAL_COMM.Connection.Interfaces;
 using SERIAL_COMM.Helpers;
@@ -16,12 +18,6 @@ namespace SERIAL_COMM.CommandLayer
 {
     internal class DeviceManager : IDisposable, IDeviceManager
     {
-        [Inject]
-        public ISerialPortMonitor SerialPortMonitor { get; set; }
-
-        [Inject]
-        public IDeviceCancellationBrokerProvider DeviceCancellationBrokerProvider { get; set; }
-
         #region --- attributes ---
         private enum ResetDeviceCfg
         {
@@ -35,6 +31,8 @@ namespace SERIAL_COMM.CommandLayer
             AddVOSComponentsInformation = 1 << 7
         }
 
+        public TaskCompletionSource<int> responseCodeResult = null;
+
         public delegate void ResponseTagsHandlerDelegate(List<TLV.TLV> tags, int responseCode, bool cancelled = false);
         internal ResponseTagsHandlerDelegate responseTagsHandler = null;
 
@@ -44,12 +42,17 @@ namespace SERIAL_COMM.CommandLayer
         public delegate void ResponseCLessHandlerDelegate(List<TLV.TLV> tags, int responseCode, int pcb, bool cancelled = false);
         internal ResponseCLessHandlerDelegate responseCLessHandler = null;
 
-        //public TaskCompletionSource<(DeviceInfoObject deviceInfoObject, int VipaResponse)> deviceIdentifier = null;
-        public TaskCompletionSource<int> deviceIdentifier = null;
+        public TaskCompletionSource<(DeviceInfoObject deviceInfoObject, int VipaResponse)> deviceIdentifier = null;
 
         int responseTagsHandlerSubscribed;
 
         #endregion --- attributes ---
+
+        [Inject]
+        public ISerialPortMonitor SerialPortMonitor { get; set; }
+
+        [Inject]
+        public IDeviceCancellationBrokerProvider DeviceCancellationBrokerProvider { get; set; }
 
         private SerialConnection connection { get; }
 
@@ -103,6 +106,7 @@ namespace SERIAL_COMM.CommandLayer
             else if (comPortEvent == PortEventType.Removal)
             {
                 Console.WriteLine($"Comport unplugged. ComportNumber '{portNumber}'");
+                connection.Dispose();
             }
         }
 
@@ -120,39 +124,46 @@ namespace SERIAL_COMM.CommandLayer
             }
         }
 
-        internal Object WriteCommand(ReadCommands command)
+        internal (DeviceInfoObject deviceInfoObject, int VipaResponse) WriteCommand(ReadCommands command)
         {
+            (DeviceInfoObject deviceInfoObject, int VipaResponse) deviceResponse = (null, (int)VipaSW1SW2Codes.Failure);
+
             switch (command)
             {
                 case ReadCommands.DEVICE_ABORT:
                 {
-                    DeviceCommandAbort();
+                    var response = DeviceCommandAbort();
+                    deviceResponse = (null, response.VipaResponse);
                     break;
                 }
                 case ReadCommands.DEVICE_RESET:
                 {
-                    DeviceCommandReset();
+                    deviceResponse = DeviceCommandReset();
                     break;
                 }
             }
 
-            return "SUCCESS" as Object;
+            return deviceResponse;
         }
 
-        internal void DeviceCommandAbort()
+        internal (int VipaData, int VipaResponse) DeviceCommandAbort()
         {
+            (int VipaData, int VipaResponse) deviceResponse = (-1, (int)VipaSW1SW2Codes.Failure);
+
+            responseCodeResult = new TaskCompletionSource<int>();
+
             try
             {
-                deviceIdentifier = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+                deviceIdentifier = new TaskCompletionSource<(DeviceInfoObject deviceInfoObject, int VipaResponse)>(TaskCreationOptions.RunContinuationsAsynchronously);
                 responseTagsHandlerSubscribed++;
-                responseTagsHandler += GetDeviceInfoResponseHandler;
+                responseTagsHandler += ResponseCodeHandler;
 
                 VIPACommand command = new VIPACommand { nad = 0x01, pcb = 0x00, cla = 0xD0, ins = 0xFF, p1 = 0x00, p2 = 0x00 };
                 WriteSingleCmd(command);
 
-                int deviceResponse = deviceIdentifier.Task.Result;
+                deviceResponse = ((int)VipaSW1SW2Codes.Success, responseCodeResult.Task.Result);
 
-                responseTagsHandler -= GetDeviceInfoResponseHandler;
+                responseTagsHandler -= ResponseCodeHandler;
                 responseTagsHandlerSubscribed--;
             }
             catch (TimeoutException e)
@@ -165,13 +176,15 @@ namespace SERIAL_COMM.CommandLayer
             {
                 Console.WriteLine("{0}: (1) DeviceManager::ResetDevice - EXCEPTION=[{1}]", DateTime.Now.ToString("yyyyMMdd:HHmmss"), op.Message);
             }
+
+            return deviceResponse;
         }
 
-        public int DeviceCommandReset()
+        public (DeviceInfoObject deviceInfoObject, int VipaResponse) DeviceCommandReset()
         {
-            int deviceResponse = -1;
+            (DeviceInfoObject deviceInfoObject, int VipaResponse) deviceResponse = (null, (int)VipaSW1SW2Codes.Failure);
 
-            deviceIdentifier = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            deviceIdentifier = new TaskCompletionSource<(DeviceInfoObject deviceInfoObject, int VipaResponse)>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             responseTagsHandlerSubscribed++;
             responseTagsHandler += GetDeviceInfoResponseHandler;
@@ -190,7 +203,6 @@ namespace SERIAL_COMM.CommandLayer
             return deviceResponse;
         }
 
-
         private void WriteSingleCmd(VIPACommand command)
         {
             connection?.WriteSingleCmd(new VIPAResponseHandlers
@@ -202,6 +214,11 @@ namespace SERIAL_COMM.CommandLayer
         }
 
         #region --- response handlers ---
+        public void ResponseCodeHandler(List<TLV.TLV> tags, int responseCode, bool cancelled = false)
+        {
+            responseCodeResult?.TrySetResult(cancelled ? -1 : responseCode);
+        }
+
         private void GetDeviceInfoResponseHandler(List<TLV.TLV> tags, int responseCode, bool cancelled = false)
         {
             var eeTemplateTag = new byte[] { 0xEE };                // EE Template tag
@@ -216,8 +233,7 @@ namespace SERIAL_COMM.CommandLayer
 
             if (cancelled)
             {
-                //deviceIdentifier?.TrySetResult((null, responseCode));
-                deviceIdentifier?.TrySetResult(responseCode);
+                deviceIdentifier?.TrySetResult((null, responseCode));
                 return;
             }
 
@@ -288,18 +304,20 @@ namespace SERIAL_COMM.CommandLayer
                 }
             }
 
-            //if (responseCode == (int)VipaSW1SW2Codes.Success)
-            if (responseCode == 0x9000)
+            if (responseCode == (int)VipaSW1SW2Codes.Success)
             {
                 if (tags?.Count > 0)
                 {
-                    /*DeviceInfoObject deviceInfoObject = new DeviceInfoObject
+                    DeviceInfoObject deviceInfoObject = new DeviceInfoObject
                     {
-                        linkDeviceResponse = deviceResponse,
-                        LinkDALRequestIPA5Object = cardInfo
+                        //linkDeviceResponse = deviceResponse,
+                        //LinkDALRequestIPA5Object = cardInfo
                     };
-                    deviceIdentifier?.TrySetResult((deviceInfoObject, responseCode));*/
-                    deviceIdentifier?.TrySetResult(responseCode);
+                    deviceIdentifier?.TrySetResult((deviceInfoObject, responseCode));
+                }
+                else
+                {
+                    deviceIdentifier?.TrySetResult((null, responseCode));
                 }
             }
         }

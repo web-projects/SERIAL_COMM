@@ -2,7 +2,7 @@
   "profiles": {
     "SERIAL_COMM": {
       "commandName": "Project",
-      "commandLineArgs": "COM9"
+      "commandLineArgs": "/ABORT COM9"
     }
   }
 }

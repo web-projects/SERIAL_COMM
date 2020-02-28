@@ -1,16 +1,23 @@
-﻿using SERIAL_COMM.Cancellation;
+﻿using Ninject;
+using SERIAL_COMM.Cancellation;
 using SERIAL_COMM.CommandLayer;
+using SERIAL_COMM.CommandLayer.Helpers;
+using SERIAL_COMM.CommandLayer.VIPA;
 using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SERIAL_COMM
 {
     class Program
     {
-        const int COMMAND_TIMEOUT = 3;
+        const int WRITE_COMMAND_TIMEOUT = 3;
         static public CancellationToken CancellationToken { get; private set; }
+
+        [Inject]
+        internal SMStateManager SMStateManager { get; set; }
 
         static void Main(string[] args)
         {
@@ -18,14 +25,31 @@ namespace SERIAL_COMM
             Console.WriteLine($"{Assembly.GetEntryAssembly().GetName().Name} - Version {Assembly.GetEntryAssembly().GetName().Version}");
             Console.WriteLine($"==========================================================================================\r\n");
 
-            if (args.Length == 1)
+            if (args.Length == 2)
             {
-                string comPort = args[0];
+                string comPort = args[1];
                 Regex rgx = new Regex(@"\d+");
                 if (comPort.IndexOf("COM") == 0 && rgx.IsMatch(comPort))
                 {
                     Console.WriteLine("main: connecting...");
-                    ProcessCommand(comPort);
+                    switch (args[0].ToUpper())
+                    {
+                        case "/ABORT":
+                        {
+                            ProcessCommand(comPort, ReadCommands.DEVICE_ABORT);
+                            break;
+                        }
+                        case "/RESET":
+                        {
+                            ProcessCommand(comPort, ReadCommands.DEVICE_RESET);
+                            break;
+                        }
+                        default:
+                        {
+                            Console.WriteLine($"Invalid command given '{args[0].ToUpper()}' - valid: [/ABORT | /RESET]");
+                            break;
+                        }
+                    }
                 }
                 else
                 {
@@ -34,33 +58,45 @@ namespace SERIAL_COMM
             }
             else
             {
-                Console.WriteLine($"Missing COM parameter - [COMX]");
+                Console.WriteLine($"Missing COM parameter(s) - [COMX][/ABORT | /RESET]");
             }
         }
 
-        static async void ProcessCommand(string comPort)
+        public Task Run()
+        {
+            _ = Task.Run(() => SMStateManager.LaunchWorkflow());
+            return Task.CompletedTask;
+        }
+
+        static async void ProcessCommand(string comPort, ReadCommands readCommand)
         {
             DeviceManager manager = new DeviceManager(comPort);
 
-            if (manager.Connect())
+            if (manager?.Connect() ?? false)
             {
                 Console.WriteLine("main: connected");
 
-                while (manager.Connected())
+                while (manager?.Connected() ?? false)
                 {
                     Thread.Sleep(5000);
                     Console.WriteLine("main: serial write...");
 
                     IDeviceCancellationBroker cancellationBroker = manager.GetDeviceCancellationBroker();
 
-                    Object output = new object();
-                    var timeoutPolicy = await cancellationBroker.ExecuteWithTimeoutAsync<Object>(
-                                        _ => manager.WriteCommand(ReadCommands.DEVICE_RESET),
-                                        COMMAND_TIMEOUT, CancellationToken);
+                    (DeviceInfoObject deviceInfoObject, int VipaResponse) deviceResponse = (null, (int)VipaSW1SW2Codes.Failure);
+
+                    var timeoutPolicy = await cancellationBroker.ExecuteWithTimeoutAsync<(DeviceInfoObject deviceInfoObject, int VipaResponse)>(
+                                        _ => manager.WriteCommand(readCommand),
+                                        WRITE_COMMAND_TIMEOUT, CancellationToken);
 
                     if (timeoutPolicy.Outcome == Polly.OutcomeType.Failure)
                     {
-                        Console.WriteLine($"Unable to obtain Card Data from device.");
+                        Console.WriteLine($"Unable to obtain response from device for command=[{readCommand}].");
+                    }
+                    else
+                    {
+                        string vipaResponse = string.Format("0x{0:X}", timeoutPolicy.Result.VipaResponse);
+                        Console.WriteLine($"command: {readCommand} - VIPA RESPONSE={vipaResponse}");
                     }
                 }
 

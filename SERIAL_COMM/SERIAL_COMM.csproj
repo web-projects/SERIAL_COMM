@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="SerialPortStream" Version="2.2.0" />
@@ -21,6 +22,7 @@
     <Folder Include="Common\" />
     <Folder Include="Cancellation\" />
     <Folder Include="Providers\" />
+    <Folder Include="State\Enums\" />
   </ItemGroup>
 
 </Project>
