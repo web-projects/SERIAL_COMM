@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SERIAL_COMM.CommandLayer
 {
-    public class VIPAResponseHandlers
+    internal class VIPAResponseHandlers
     {
         public DeviceManager.ResponseTagsHandlerDelegate responsetagshandler { get; set; }
         public DeviceManager.ResponseTaglessHandlerDelegate responsetaglesshandler { get; set; }

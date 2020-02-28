@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SERIAL_COMM": {
+      "commandName": "Project",
+      "commandLineArgs": "COM9"
+    }
+  }
+}

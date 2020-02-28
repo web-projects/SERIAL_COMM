@@ -1,9 +1,11 @@
 ﻿using Ninject;
+using SERIAL_COMM.Cancellation;
 using SERIAL_COMM.CommandLayer.Extensions;
 using SERIAL_COMM.Connection;
 using SERIAL_COMM.Connection.Interfaces;
 using SERIAL_COMM.Helpers;
 using SERIAL_COMM.Modules;
+using SERIAL_COMM.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +14,27 @@ using System.Threading.Tasks;
 
 namespace SERIAL_COMM.CommandLayer
 {
-    public class DeviceManager : IDisposable
+    internal class DeviceManager : IDisposable, IDeviceManager
     {
+        [Inject]
+        public ISerialPortMonitor SerialPortMonitor { get; set; }
+
+        [Inject]
+        public IDeviceCancellationBrokerProvider DeviceCancellationBrokerProvider { get; set; }
+
+        #region --- attributes ---
+        private enum ResetDeviceCfg
+        {
+            ReturnSerialNumber = 1 << 0,
+            ReturnAfterCardRemoval = 1 << 1,
+            LeaveScreenDisplayUnchanged = 1 << 2,
+            SlideShowStartsNormalTiming = 1 << 3,
+            NoBeepDuringReset = 1 << 4,
+            ResetImmediately = 1 << 5,
+            ReturnPinpadConfiguration = 1 << 6,
+            AddVOSComponentsInformation = 1 << 7
+        }
+
         public delegate void ResponseTagsHandlerDelegate(List<TLV.TLV> tags, int responseCode, bool cancelled = false);
         internal ResponseTagsHandlerDelegate responseTagsHandler = null;
 
@@ -28,10 +49,9 @@ namespace SERIAL_COMM.CommandLayer
 
         int responseTagsHandlerSubscribed;
 
-        private SerialConnection connection { get; }
+        #endregion --- attributes ---
 
-        [Inject]
-        public ISerialPortMonitor SerialPortMonitor { get; set; }
+        private SerialConnection connection { get; }
 
         //public DeviceEventHandler DeviceEventReceived { get; set; }
 
@@ -55,6 +75,10 @@ namespace SERIAL_COMM.CommandLayer
 
             connection?.Dispose();
         }
+
+        public IDeviceCancellationBroker GetCancellationBroker() => DeviceCancellationBrokerProvider.GetDeviceCancellationBroker();
+
+        public IDeviceCancellationBroker GetDeviceCancellationBroker() => this.GetCancellationBroker();
 
         public bool Connect()
         {
@@ -96,19 +120,26 @@ namespace SERIAL_COMM.CommandLayer
             }
         }
 
-        internal void WriteCommand(ReadCommands command, CancellationTokenSource cancellationToken, int timeout)
+        internal Object WriteCommand(ReadCommands command)
         {
             switch (command)
             {
+                case ReadCommands.DEVICE_ABORT:
+                {
+                    DeviceCommandAbort();
+                    break;
+                }
                 case ReadCommands.DEVICE_RESET:
                 {
-                    DeviceCommandReset(cancellationToken, timeout);
+                    DeviceCommandReset();
                     break;
                 }
             }
+
+            return "SUCCESS" as Object;
         }
 
-        internal async void DeviceCommandReset(CancellationTokenSource cancellationToken, int timeout)
+        internal void DeviceCommandAbort()
         {
             try
             {
@@ -118,8 +149,6 @@ namespace SERIAL_COMM.CommandLayer
 
                 VIPACommand command = new VIPACommand { nad = 0x01, pcb = 0x00, cla = 0xD0, ins = 0xFF, p1 = 0x00, p2 = 0x00 };
                 WriteSingleCmd(command);
-
-                await TaskCompletionSourceExtension.WaitAsync(deviceIdentifier, cancellationToken.Token, timeout, true);
 
                 int deviceResponse = deviceIdentifier.Task.Result;
 
@@ -137,6 +166,30 @@ namespace SERIAL_COMM.CommandLayer
                 Console.WriteLine("{0}: (1) DeviceManager::ResetDevice - EXCEPTION=[{1}]", DateTime.Now.ToString("yyyyMMdd:HHmmss"), op.Message);
             }
         }
+
+        public int DeviceCommandReset()
+        {
+            int deviceResponse = -1;
+
+            deviceIdentifier = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            responseTagsHandlerSubscribed++;
+            responseTagsHandler += GetDeviceInfoResponseHandler;
+
+            VIPACommand command = new VIPACommand { nad = 0x01, pcb = 0x00, cla = 0xD0, ins = 0xFF, p1 = 0x00, p2 = 0x00 };
+            WriteSingleCmd(command);
+
+            command = new VIPACommand { nad = 0x01, pcb = 0x00, cla = 0xD0, ins = 0x00, p1 = 0x00, p2 = (byte)(ResetDeviceCfg.ReturnSerialNumber | ResetDeviceCfg.ReturnAfterCardRemoval | ResetDeviceCfg.ReturnPinpadConfiguration) };
+            WriteSingleCmd(command);   // Device Info [D0, 00]
+
+            deviceResponse = deviceIdentifier.Task.Result;
+
+            responseTagsHandler -= GetDeviceInfoResponseHandler;
+            responseTagsHandlerSubscribed--;
+
+            return deviceResponse;
+        }
+
 
         private void WriteSingleCmd(VIPACommand command)
         {

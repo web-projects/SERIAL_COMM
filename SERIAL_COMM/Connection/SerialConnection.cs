@@ -1,4 +1,5 @@
 ﻿using SERIAL_COMM.CommandLayer;
+using SERIAL_COMM.CommandLayer.TLV;
 using SERIAL_COMM.Helpers;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,20 @@ using System.Threading;
 
 namespace SERIAL_COMM.Connection
 {
-    public class SerialConnection : IDisposable
+    internal class SerialConnection : IDisposable, ISerialConnection
     {
         #region --- attributes ---
+        private enum ReadErrorLevel
+        {
+            None,
+            Length,
+            Invalid_NAD,
+            Invalid_PCB,
+            Invalid_CombinedBytes,
+            Missing_LRC,
+            CombinedBytes_MisMatch
+        }
+
         private Thread readThread;
         private bool readContinue = true;
 
@@ -49,6 +61,135 @@ namespace SERIAL_COMM.Connection
 
             lock (ReadResponsesBytesLock)
             {
+                // Add current bytes to available bytes
+                var combinedResponseBytes = new byte[ReadResponsesBytes.Length + responseBytes.Length];
+
+                // TODO ---> @JonBianco BlockCopy should be leveraging here as it is vastly superior to Array.Copy
+                // Combine prior bytes with new bytes
+                Array.Copy(ReadResponsesBytes, 0, combinedResponseBytes, 0, ReadResponsesBytes.Length);
+                Array.Copy(responseBytes, 0, combinedResponseBytes, ReadResponsesBytes.Length, responseBytes.Length);
+
+                // Attempt to parse first message in response buffer
+                var consumedResponseBytes = 0;
+                var responseCode = 0;
+                var errorFound = false;
+
+                ReadErrorLevel readErrorLevel = ReadErrorLevel.None;
+
+                // Validate NAD, PCB, and LEN values
+                if (combinedResponseBytes.Length < 4)
+                {
+                    errorFound = true;
+                    readErrorLevel = ReadErrorLevel.Length;
+                }
+                else if (!validNADValues.Contains(combinedResponseBytes[0]))
+                {
+                    errorFound = true;
+                    readErrorLevel = ReadErrorLevel.Invalid_NAD;
+                }
+                else if (!validPCBValues.Contains(combinedResponseBytes[1]))
+                {
+                    errorFound = true;
+                    readErrorLevel = ReadErrorLevel.Invalid_PCB;
+                }
+                else if (combinedResponseBytes[2] > (combinedResponseBytes.Length - (3 + 1)))
+                {
+                    errorFound = true;
+                    readErrorLevel = ReadErrorLevel.Invalid_CombinedBytes;
+                }
+                else
+                {
+                    // Validate LRC
+                    byte lrc = 0;
+                    var index = 0;
+                    for (index = 0; index < (combinedResponseBytes[2] + 3); index++)
+                    {
+                        lrc ^= combinedResponseBytes[index];
+                    }
+
+                    if (combinedResponseBytes[combinedResponseBytes[2] + 3] != lrc)
+                    {
+                        errorFound = true;
+                        readErrorLevel = ReadErrorLevel.Missing_LRC;
+                    }
+                    else if ((combinedResponseBytes[1] & 0x01) == 0x01)
+                    {
+                        var componentBytes = new byte[combinedResponseBytes[2]];
+                        Array.Copy(combinedResponseBytes, 3, componentBytes, 0, combinedResponseBytes[2]);
+                        ReadResponseComponentBytes.Add(componentBytes);
+                        consumedResponseBytes = combinedResponseBytes[2] + 3 + 1;
+                        errorFound = true;
+                        readErrorLevel = ReadErrorLevel.CombinedBytes_MisMatch;
+                        addedResponseComponent = true;
+                    }
+                    else
+                    {
+                        var sw1Offset = combinedResponseBytes[2] + 3 - 2;
+                        //if ((combinedResponseBytes[sw1Offset] != 0x90) && (combinedResponseBytes[sw1Offset + 1] != 0x00))
+                        //    errorFound = true;
+                        responseCode = (combinedResponseBytes[sw1Offset] << 8) + combinedResponseBytes[sw1Offset + 1];
+                    }
+                }
+
+                if (!errorFound)
+                {
+                    var totalDecodeSize = combinedResponseBytes[2] - 2;        // Use LEN of final response packet
+                    foreach (var component in ReadResponseComponentBytes)
+                    {
+                        totalDecodeSize += component.Length;
+                    }
+
+                    var totalDecodeBytes = new byte[totalDecodeSize];
+                    var totalDecodeOffset = 0;
+                    foreach (var component in ReadResponseComponentBytes)
+                    {
+                        Array.Copy(component, 0, totalDecodeBytes, totalDecodeOffset, component.Length);
+                        totalDecodeOffset += component.Length;
+                    }
+                    Array.Copy(combinedResponseBytes, 3, totalDecodeBytes, totalDecodeOffset, combinedResponseBytes[2] - 2);    // Skip final response header and use LEN of final response (no including the SW1, SW2, and LRC)
+
+                    ReadResponseComponentBytes = new List<byte[]>();
+
+                    if (ResponseTagsHandler != null || ResponseContactlessHandler != null)
+                    {
+                        TLV tlv = new TLV();
+                        var tags = tlv.Decode(totalDecodeBytes, 0, totalDecodeBytes.Length, nestedTagTags);
+
+                        //PrintTags(tags);
+                        if (ResponseTagsHandler != null)
+                        {
+                            ResponseTagsHandler.Invoke(tags, responseCode);
+                        }
+                        else if (ResponseContactlessHandler != null)
+                        {
+                            ResponseContactlessHandler.Invoke(tags, responseCode, combinedResponseBytes[1]);
+                        }
+                    }
+                    else if (ResponseTaglessHandler != null)
+                    {
+                        ResponseTaglessHandler.Invoke(totalDecodeBytes, responseCode);
+                    }
+
+                    consumedResponseBytes = combinedResponseBytes[2] + 3 + 1;  // Consumed NAD, PCB, LEN, [LEN] bytes, and LRC
+
+                    addedResponseComponent = (combinedResponseBytes.Length - consumedResponseBytes) > 0;
+                }
+                else
+                {
+                    // allows for debugging of VIPA read issues
+                    System.Diagnostics.Debug.WriteLine($"VIPA-READ: ERROR LEVEL: '{readErrorLevel}'");
+                }
+
+                // Remove consumed bytes and leave remaining bytes for later consumption
+                var remainingResponseBytes = new byte[combinedResponseBytes.Length - consumedResponseBytes];
+                Array.Copy(combinedResponseBytes, consumedResponseBytes, remainingResponseBytes, 0, combinedResponseBytes.Length - consumedResponseBytes);
+
+                ReadResponsesBytes = remainingResponseBytes;
+            }
+
+            if (addedResponseComponent)
+            {
+                ReadResponses(Array.Empty<byte>());
             }
         }
 
@@ -209,7 +350,7 @@ namespace SERIAL_COMM.Connection
                     Dispose();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
             }
