@@ -1,4 +1,5 @@
-﻿using SERIAL_COMM.Helpers;
+﻿using SERIAL_COMM.CommandLayer;
+using SERIAL_COMM.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -30,6 +31,10 @@ namespace SERIAL_COMM.Connection
         private static ManagementEventWatcher removal;
 
         public static event EventHandler<PortsChangedArgs> PortsChanged;
+
+        internal DeviceManager.ResponseTagsHandlerDelegate ResponseTagsHandler = null;
+        internal DeviceManager.ResponseTaglessHandlerDelegate ResponseTaglessHandler = null;
+        internal DeviceManager.ResponseCLessHandlerDelegate ResponseContactlessHandler = null;
 
         #endregion
 
@@ -83,8 +88,9 @@ namespace SERIAL_COMM.Connection
             {
                 serialPort.Write(msg, 0, msg.Length);
             }
-            catch (TimeoutException)
+            catch (TimeoutException e)
             {
+                Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
             }
         }
 
@@ -110,7 +116,7 @@ namespace SERIAL_COMM.Connection
                 serialPort = new System.IO.Ports.SerialPort(commPort);
 
                 // Update the Handshake
-                serialPort.Handshake = System.IO.Ports.Handshake.None;
+                serialPort.Handshake = Handshake.None;
 
                 // Set the read/write timeouts
                 serialPort.ReadTimeout = 10000;
@@ -120,7 +126,7 @@ namespace SERIAL_COMM.Connection
                 serialPort.Open();
 
                 // monitor port changes
-                PortsChanged += OnPortsChanged;
+                //PortsChanged += OnPortsChanged;
                 lastCDHolding = serialPort.CDHolding;
 
                 // discard any buffered bytes
@@ -133,8 +139,10 @@ namespace SERIAL_COMM.Connection
 
                 return connected = true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
+
                 if (exposeExceptions)
                 {
                     throw;
@@ -175,11 +183,11 @@ namespace SERIAL_COMM.Connection
                     readContinue = false;
                     Thread.Sleep(1000);
 
-                    PortsChanged -= OnPortsChanged;
+                    //PortsChanged -= OnPortsChanged;
 
                     serialPort.Close();
 
-                    readThread.Join();
+                    readThread.Join(1000);
                 }
                 catch (Exception)
                 {
@@ -193,10 +201,17 @@ namespace SERIAL_COMM.Connection
 
         public bool Connected()
         {
-            if (lastCDHolding != serialPort.CDHolding)
+            try
             {
-                connected = false;
-                Dispose();
+                if (lastCDHolding != serialPort?.CDHolding)
+                {
+                    connected = false;
+                    Dispose();
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
             }
 
             return connected;
@@ -279,9 +294,82 @@ namespace SERIAL_COMM.Connection
 
         public static string[] GetAvailableSerialPorts()
         {
-            return SerialPort.GetPortNames();
+            return System.IO.Ports.SerialPort.GetPortNames();
         }
 
         #endregion
+
+        #region --- COMMANDS ---
+
+        public void WriteSingleCmd(VIPAResponseHandlers responsehandlers, VIPACommand command)
+        {
+            if (command == null)
+            {
+                return;
+            }
+
+            ResponseTagsHandler = responsehandlers.responsetagshandler;
+            ResponseTaglessHandler = responsehandlers.responsetaglesshandler;
+            ResponseContactlessHandler = responsehandlers.responsecontactlesshandler;
+
+            int dataLen = command.data?.Length ?? 0;
+            byte lrc = 0;
+
+            if (0 < dataLen)
+            {
+                dataLen++;  // Allow for Lc byte
+            }
+
+            if (command.includeLE)
+            {
+                dataLen++;  // Allow for Le byte
+            }
+
+            var cmdLength = 7 /*NAD, PCB, LEN, CLA, INS, P1, P2*/ + dataLen + 1 /*LRC*/;
+            var cmdBytes = new byte[cmdLength];
+            var cmdIndex = 0;
+
+            cmdBytes[cmdIndex++] = command.nad;
+            lrc ^= command.nad;
+            cmdBytes[cmdIndex++] = command.pcb;
+            lrc ^= command.pcb;
+            cmdBytes[cmdIndex++] = (byte)(4 /*CLA, INS, P1, P2*/ + dataLen /*Lc, data.Length, Le*/);
+            lrc ^= (byte)(4 /*CLA, INS, P1, P2*/ + dataLen /*Lc, data.Length, Le*/);
+            cmdBytes[cmdIndex++] = command.cla;
+            lrc ^= command.cla;
+            cmdBytes[cmdIndex++] = command.ins;
+            lrc ^= command.ins;
+            cmdBytes[cmdIndex++] = command.p1;
+            lrc ^= command.p1;
+            cmdBytes[cmdIndex++] = command.p2;
+            lrc ^= command.p2;
+
+            if (0 < command.data?.Length)
+            {
+                cmdBytes[cmdIndex++] = (byte)command.data.Length;
+                lrc ^= (byte)command.data.Length;
+
+                foreach (var byt in command.data)
+                {
+                    cmdBytes[cmdIndex++] = byt;
+                    lrc ^= byt;
+                }
+            }
+
+            if (command.includeLE)
+            {
+                cmdBytes[cmdIndex++] = command.le;
+                lrc ^= command.le;
+            }
+
+            cmdBytes[cmdIndex++] = lrc;
+
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"VIPA-WRITE: {BitConverter.ToString(cmdBytes)}");
+#endif
+            WriteBytes(cmdBytes);
+        }
+
+        #endregion --- COMMANDS ---
     }
 }

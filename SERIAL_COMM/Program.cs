@@ -1,4 +1,5 @@
-﻿using SERIAL_COMM.Connection;
+﻿using SERIAL_COMM.CommandLayer;
+using SERIAL_COMM.Connection;
 using System;
 using System.Threading;
 
@@ -10,16 +11,24 @@ namespace SERIAL_COMM
         {
             Console.WriteLine("main: connecting...");
 
-            SerialConnection connection = new SerialConnection("COM11");
+            DeviceManager manager = new DeviceManager("COM3");
 
-            if (connection.Connect())
+            if (manager.Connect())
             {
                 Console.WriteLine("main: connected");
 
-                while (connection.Connected())
+                while (manager.Connected())
                 {
-                    Thread.Sleep(1000);
-                    Console.WriteLine("main: serial read...");
+                    Thread.Sleep(5000);
+                    Console.WriteLine("main: serial write...");
+
+                    int timeout = 3000;
+                    var cancelTokenSource = new CancellationTokenSource(timeout); ;
+
+                    manager.WriteCommand(ReadCommands.DEVICE_RESET, cancelTokenSource, timeout);
+
+                    cancelTokenSource.Cancel();
+                    cancelTokenSource.Dispose();
                 }
 
                 Console.WriteLine("port: disconnected");
