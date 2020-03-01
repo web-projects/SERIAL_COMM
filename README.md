@@ -36,3 +36,4 @@ This an applicationto test Serial Communication.
 * 20200228 - Added Polly for timeout management.
            - Added AbortCommand logic.
            - StateMachine initial.
+* 20200229 - Added Application Provider.
