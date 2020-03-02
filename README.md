@@ -37,3 +37,4 @@ This an applicationto test Serial Communication.
            - Added AbortCommand logic.
            - StateMachine initial.
 * 20200229 - Added Application Provider.
+* 20200301 - StateMachine part 2.

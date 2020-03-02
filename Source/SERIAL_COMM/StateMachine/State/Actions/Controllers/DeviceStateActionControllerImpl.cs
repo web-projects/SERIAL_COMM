@@ -15,10 +15,11 @@ namespace SERIAL_COMM.StateMachine.State.Actions.Controllers
                 new Dictionary<DeviceWorkflowState, Func<IDeviceStateController, IDeviceStateAction>>
                 {
                     [DeviceWorkflowState.None] = (IDeviceStateController _) => new DeviceNoneStateAction(_),
-                    //[DeviceWorkflowState.DeviceRecovery] = (IDeviceStateController _) => new DeviceRecoveryStateAction(_),
-                    //[DeviceWorkflowState.InitializeDeviceCommunication] = (DeviceMStateController _) => new DeviceInitializeDeviceCommunicationStateAction(_),
+                    [DeviceWorkflowState.DeviceRecovery] = (IDeviceStateController _) => new DeviceRecoveryStateAction(_),
+                    [DeviceWorkflowState.InitializeDeviceCommunication] = (IDeviceStateController _) => new DeviceInitializeDeviceCommunicationStateAction(_),
+                    [DeviceWorkflowState.InitializeDeviceHealth] = (IDeviceStateController _) => new DeviceInitializeDeviceHealthStateAction(_),
                     [DeviceWorkflowState.Manage] = (IDeviceStateController _) => new DeviceManageStateAction(_),
-                    //[DeviceWorkflowState.ProcessRequest] = (ISMStateController _) => new DeviceProcessRequestStateAction(_),
+                    [DeviceWorkflowState.ProcessRequest] = (IDeviceStateController _) => new DeviceProcessRequestStateAction(_),
                     //[DeviceWorkflowState.SubWorkflowIdleState] = (IDeviceStateController _) => new DeviceSubWorkflowIdleStateAction(_),
                     [DeviceWorkflowState.Shutdown] = (IDeviceStateController _) => new DeviceShutdownStateAction(_)
                 }

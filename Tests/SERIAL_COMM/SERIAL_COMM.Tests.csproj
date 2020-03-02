@@ -28,7 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Helpers\Polly\" />
     <Folder Include="SerialPort\" />
+    <Folder Include="State\Cancellation\" />
   </ItemGroup>
 
 </Project>

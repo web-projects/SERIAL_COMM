@@ -1,4 +1,5 @@
-﻿using SERIAL_COMM.Helpers;
+﻿using SERIAL_COMM.Common;
+using SERIAL_COMM.Helpers;
 using SERIAL_COMM.StateMachine.State.Enums;
 using SERIAL_COMM.StateMachine.State.Interfaces;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace SERIAL_COMM.StateMachine.State.Actions
         {
             Controller = controller;
             Controller.RequestReceived += RequestReceived;
-            //Controller.DeviceEventReceived += DeviceEventReceived;
+            Controller.DeviceEventReceived += DeviceEventReceived;
             Controller.ComPortEventReceived += ComportEventReceived;
         }
 
@@ -45,17 +46,17 @@ namespace SERIAL_COMM.StateMachine.State.Actions
         }
 
         //public virtual void RequestReceived(LinkRequest request)
+
         public virtual void RequestReceived(object request)
         {
 
         }
 
-        //public virtual void DeviceEventReceived(DeviceEvent deviceEvent, DeviceInformation deviceInformation)
-        //{
-        //    // TODO: currently the workflow supports a single TargetDevice - we need to enhance the code to support 
-        //    // multiple devices
-
-        //}
+        public virtual void DeviceEventReceived(DeviceEvent deviceEvent, DeviceInformation deviceInformation)
+        {
+            // TODO: currently the workflow supports a single TargetDevice - we need to enhance the code to support 
+            // multiple devices
+        }
 
         public void ComportEventReceived(PortEventType comPortEvent, string portNumber)
         {

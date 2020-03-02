@@ -14,6 +14,11 @@
         DeviceRecovery,
 
         /// <summary>
+        /// Represents a state when the workflow is obtains the health status of the target device.
+        /// </summary>
+        InitializeDeviceHealth,
+
+        /// <summary>
         /// Represents a state where the device is detected and successfully connected to.
         /// </summary>
         InitializeDeviceCommunication,

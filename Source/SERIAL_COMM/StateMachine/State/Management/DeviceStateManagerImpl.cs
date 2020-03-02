@@ -10,6 +10,10 @@ using SERIAL_COMM.StateMachine.State.Interfaces;
 using SERIAL_COMM.StateMachine.State.Actions;
 using SERIAL_COMM.StateMachine.State.Actions.Controllers;
 using SERIAL_COMM.StateMachine.State.Providers;
+using SERIAL_COMM.Config;
+using SERIAL_COMM.Providers;
+using SERIAL_COMM.StateMachine.Cancellation;
+using SERIAL_COMM.Common;
 
 namespace SERIAL_COMM.StateMachine.State.Management
 {
@@ -21,8 +25,8 @@ namespace SERIAL_COMM.StateMachine.State.Management
         //[Inject]
         //public IListenerConnectorProvider ListenerConnectorProvider { get; set; }
 
-        //[Inject]
-        //public IDeviceConfigurationProvider DeviceConfigurationProvider { get; set; }
+        [Inject]
+        public IDeviceConfigurationProvider DeviceConfigurationProvider { get; set; }
 
         //[Inject]
         //public IDevicePluginLoader DevicePluginLoader { get; set; }
@@ -42,10 +46,10 @@ namespace SERIAL_COMM.StateMachine.State.Management
         [Inject]
         public ISerialPortMonitor SerialPortMonitor { get; set; }
 
-        //[Inject]
-        //public IDeviceCancellationBrokerProvider DeviceCancellationBrokerProvider { get; set; }
+        [Inject]
+        public IDeviceCancellationBrokerProvider DeviceCancellationBrokerProvider { get; set; }
 
-        //public DeviceSection Configuration { get; private set; }
+        public DeviceSection Configuration { get; private set; }
 
         //public ILoggingServiceClient LoggingClient { get; private set; }
 
@@ -59,7 +63,7 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
         //public List<ICardDevice> TargetDevices { get; private set; }
 
-        //public DeviceEventHandler DeviceEventReceived { get; set; }
+        public DeviceEventHandler DeviceEventReceived { get; set; }
 
         public ComPortEventHandler ComPortEventReceived { get; set; }
 
@@ -88,7 +92,7 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
         public void Initialize()
         {
-            //DeviceEventReceived = OnDeviceEventReceived;
+            DeviceEventReceived = OnDeviceEventReceived;
             ComPortEventReceived = OnComPortEventReceived;
 
             SerialPortMonitor.ComportEventOccured += OnComPortEventReceived;
@@ -96,8 +100,8 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
             StateActionRules = new StateActionRules();
 
-            //DeviceConfigurationProvider.InitializeConfiguration();
-            //Configuration = DeviceConfigurationProvider.GetAppConfig();
+            DeviceConfigurationProvider.InitializeConfiguration();
+            Configuration = DeviceConfigurationProvider.GetAppConfig();
             //LoggingClient = LoggingServiceClientProvider.GetLoggingServiceClient();
             //Connector = ListenerConnectorProvider.GetConnector(DeviceConfigurationProvider.GetConfiguration());
 
@@ -167,7 +171,7 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
         //public IControllerVisitorProvider GetCurrentVisitorProvider() => ControllerVisitorProvider;
 
-        //public IDeviceCancellationBroker GetCancellationBroker() => DeviceCancellationBrokerProvider.GetDeviceCancellationBroker();
+        public IDeviceCancellationBroker GetCancellationBroker() => DeviceCancellationBrokerProvider.GetDeviceCancellationBroker();
 
         //public ISubStateManagerProvider GetSubStateManagerProvider() => SubStateManagerProvider;
 
@@ -191,8 +195,8 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
         protected void RaiseOnWorkflowStopped(DeviceWorkflowStopReason reason) => WorkflowStopped?.Invoke(reason);
 
-        //private void OnDeviceEventReceived(DeviceEvent deviceEvent, DeviceInformation deviceInformation)
-        //{
+        private void OnDeviceEventReceived(Common.DeviceEvent deviceEvent, DeviceInformation deviceInformation)
+        {
         //    if (currentStateAction.WorkflowStateType == SubWorkflowIdleState)
         //    {
         //        if (subStateController != null)
@@ -201,7 +205,7 @@ namespace SERIAL_COMM.StateMachine.State.Management
         //            subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
         //        }
         //    }
-        //}
+        }
 
         private void OnComPortEventReceived(PortEventType comPortEvent, string portNumber)
         {
@@ -489,8 +493,8 @@ namespace SERIAL_COMM.StateMachine.State.Management
             {
                 disposed = true;
 
-                //_ = LoggingClient.LogInfoAsync("Currently shutting down DAL Workflow...");
-                Console.WriteLine("Currently shutting down DAL Workflow...");
+                //_ = LoggingClient.LogInfoAsync("Currently shutting down DEVICE Workflow...");
+                Console.WriteLine("Currently shutting down DEVICE Workflow...");
 
                 currentStateAction?.Dispose();
 
@@ -500,12 +504,6 @@ namespace SERIAL_COMM.StateMachine.State.Management
 
                 ExecuteFinalState();
             }
-        }
-
-        private void ExecuteFinalState()
-        {
-            using IDeviceStateAction lastAction = stateActionController.GetFinalState();
-            lastAction.DoWork().Wait(2000);
         }
 
         private async Task AdvanceStateActionTransition(IDeviceStateAction oldState)
@@ -555,9 +553,15 @@ namespace SERIAL_COMM.StateMachine.State.Management
         protected void RaiseStateChange(DeviceWorkflowState oldState, DeviceWorkflowState newState)
                     => StateChange?.Invoke(oldState, newState);
 
+        private void ExecuteFinalState()
+        {
+            using IDeviceStateAction lastAction = stateActionController.GetFinalState();
+            lastAction.DoWork().Wait(2000);
+        }
+
         private void LogStateChange(DeviceWorkflowState oldState, DeviceWorkflowState newState)
-            //=> _ = LoggingClient.LogInfoAsync($"Sub-Workflow State change from '{oldState}' to '{newState}' detected.");
-            => Console.WriteLine($"Sub-Workflow State change from '{oldState}' to '{newState}' detected.");
+            //=> _ = LoggingClient.LogInfoAsync($"Workflow State change from '{oldState}' to '{newState}' detected.");
+            => Console.WriteLine($"Workflow State change from '{oldState}' to '{newState}' detected.");
 
         public async Task Error(IDeviceStateAction state)
         {

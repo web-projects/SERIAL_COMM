@@ -8,10 +8,8 @@ namespace SERIAL_COMM.StateMachine.State
         private static DeviceWorkflowState ComputeNoneStateTransition(bool exception) =>
             exception switch
             {
-                //true => InitializeDeviceCommunication,
-                //false => InitializeDeviceCommunication
-                true => Manage,
-                false => Manage
+                true => InitializeDeviceCommunication,
+                false => InitializeDeviceCommunication
             };
 
         private static DeviceWorkflowState ComputeDeviceRecoveryStateTransition(bool exception) =>
@@ -19,6 +17,20 @@ namespace SERIAL_COMM.StateMachine.State
             {
                 true => InitializeDeviceCommunication,
                 false => InitializeDeviceCommunication
+            };
+
+        private static DeviceWorkflowState ComputeInitializeDeviceCommunicationStateTransition(bool exception) =>
+            exception switch
+            {
+                true => DeviceRecovery,
+                false => InitializeDeviceHealth
+            };
+
+        private static DeviceWorkflowState ComputeInitializeDeviceHealthStateTransition(bool exception) =>
+            exception switch
+            {
+                true => DeviceRecovery,
+                false => Manage
             };
 
         private static DeviceWorkflowState ComputeManageStateTransition(bool exception) =>
@@ -35,7 +47,7 @@ namespace SERIAL_COMM.StateMachine.State
                 false => SubWorkflowIdleState
             };
 
-        private static DeviceWorkflowState ComputeSubWorkflowIdleStateTransition(bool exception) => 
+        private static DeviceWorkflowState ComputeSubWorkflowIdleStateTransition(bool exception) =>
             exception switch
             {
                 true => DeviceRecovery,
@@ -47,6 +59,8 @@ namespace SERIAL_COMM.StateMachine.State
             {
                 None => ComputeNoneStateTransition(exception),
                 DeviceRecovery => ComputeDeviceRecoveryStateTransition(exception),
+                InitializeDeviceCommunication => ComputeInitializeDeviceCommunicationStateTransition(exception),
+                InitializeDeviceHealth => ComputeInitializeDeviceHealthStateTransition(exception),
                 Manage => ComputeManageStateTransition(exception),
                 ProcessRequest => ComputeProcessRequestStateTransition(exception),
                 SubWorkflowIdleState => ComputeSubWorkflowIdleStateTransition(exception),

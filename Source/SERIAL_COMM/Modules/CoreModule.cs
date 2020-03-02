@@ -4,6 +4,7 @@ using SERIAL_COMM.Connection.Interfaces;
 using SERIAL_COMM.Connection.SerialPort;
 using SERIAL_COMM.StateMachine.State.Providers;
 using SERIAL_COMM.StateMachine.State.Management;
+using SERIAL_COMM.Config;
 
 namespace SERIAL_COMM.Modules
 {
@@ -12,7 +13,7 @@ namespace SERIAL_COMM.Modules
         public override void Load()
         {
             Bind<IDeviceApplicationProvider>().To<DeviceApplicationProvider>();
-            //Bind<IDeviceConfigurationProvider>().To<DeviceConfigurationProvider>();
+            Bind<IDeviceConfigurationProvider>().To<DeviceConfigurationProvider>();
             Bind<IDeviceStateActionControllerProvider>().To<DeviceStateActionControllerProvider>();
             Bind<IDeviceStateManager>().To<DeviceStateManagerImpl>();
             //Bind<ISubStateManagerProvider>().To<SubStateManagerProviderImpl>();

@@ -1,4 +1,6 @@
-﻿using SERIAL_COMM.Connection.Interfaces;
+﻿using SERIAL_COMM.Config;
+using SERIAL_COMM.Connection.Interfaces;
+using SERIAL_COMM.StateMachine.Cancellation;
 using SERIAL_COMM.StateMachine.State.Actions;
 
 namespace SERIAL_COMM.StateMachine.State.Interfaces
@@ -8,7 +10,7 @@ namespace SERIAL_COMM.StateMachine.State.Interfaces
         string PluginPath { get; }
         //ICardDevice TargetDevice { get; }
         //List<ICardDevice> TargetDevices { get; }
-        //DeviceSection Configuration { get; }
+        DeviceSection Configuration { get; }
         //IDevicePluginLoader DevicePluginLoader { get; set; }
         ISerialPortMonitor SerialPortMonitor { get; }
         //PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
@@ -21,6 +23,6 @@ namespace SERIAL_COMM.StateMachine.State.Interfaces
         void SaveState(object stateObject);
         //IControllerVisitorProvider GetCurrentVisitorProvider();
         //ISubStateManagerProvider GetSubStateManagerProvider();
-        //IDeviceCancellationBroker GetCancellationBroker();
+        IDeviceCancellationBroker GetCancellationBroker();
     }
 }
