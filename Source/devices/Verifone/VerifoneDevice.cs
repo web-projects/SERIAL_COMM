@@ -2,12 +2,11 @@
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Devices.Verifone.Connection;
-using Devices.Verifone.Interfaces;
 using Devices.Verifone.VIPA;
 using Ninject;
 using System;
-using System.Composition;
 using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
 
 namespace Devices.Verifone
@@ -17,19 +16,19 @@ namespace Devices.Verifone
     [Export("Verifone-P200", typeof(ICardDevice))]
     [Export("Verifone-P400", typeof(ICardDevice))]
     [Export("Verifone-UX300", typeof(ICardDevice))]
-    internal class VerifoneDevice : IDisposable, ICardDevice, IVerifone
+    internal class VerifoneDevice : IDisposable, ICardDevice
     {
         public string Name => StringValueAttribute.GetStringValue(DeviceType.Verifone);
 
         //public event PublishEvent PublishEvent;
         public event DeviceEventHandler DeviceEventOccured;
 
-        private SerialConnection serialConnection { get; set;  }
+        private SerialConnection serialConnection { get; set; }
 
         private bool IsConnected { get; set; }
 
         [Inject]
-        internal IVIPADevice vipaDevice { get; } = new VIPADevice();
+        internal IVIPADevice vipaDevice { get; set; }
 
         public DeviceInformation DeviceInformation { get; private set; }
 
@@ -53,17 +52,6 @@ namespace Devices.Verifone
             vipaDevice?.Dispose();
         }
 
-        public bool Connect()
-        {
-            IsConnected = vipaDevice.Connect(serialConnection);
-            return IsConnected;
-        }
-
-        public bool Connected()
-        {
-            return IsConnected;
-        }
-
         bool ICardDevice.IsConnected(object request)
         {
             return IsConnected;
@@ -71,9 +59,14 @@ namespace Devices.Verifone
 
         public void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
         {
-            DeviceInformation.ComPort = config.SerialConfig.CommPortName;
-            serialConnection = new SerialConnection(config.SerialConfig.CommPortName);
-            active = IsConnected = serialConnection.Connect();
+            DeviceInformation = deviceInfo;
+            DeviceInformation.Manufacturer = ManufacturerConfigID;
+            DeviceInformation.ComPort = deviceInfo.ComPort;
+
+            serialConnection = new SerialConnection(deviceInfo.ComPort);
+
+            vipaDevice = new VIPADevice();
+            active = IsConnected = vipaDevice.Connect(serialConnection);
         }
 
         public List<DeviceInformation> DiscoverDevices()
@@ -95,7 +88,7 @@ namespace Devices.Verifone
                         VendorIdentifier = Connection.DeviceDiscovery.VID
                     });
 
-                    System.Diagnostics.Debug.WriteLine($"device: VERIFONE MODEL={deviceInformation[deviceInformation.Count - 1].ProductIdentification}, " +
+                    System.Diagnostics.Debug.WriteLine($"device: ON PORT={device.ComPort} - VERIFONE MODEL={deviceInformation[deviceInformation.Count - 1].ProductIdentification}, " +
                         $"SN=[{deviceInformation[deviceInformation.Count - 1].SerialNumber}], PORT={deviceInformation[deviceInformation.Count - 1].ComPort}");
                 }
             }
@@ -111,12 +104,13 @@ namespace Devices.Verifone
 
         public void DeviceSetIdle()
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"DEVICE: ON PORT={DeviceInformation.ComPort} - SET-IDLE");
         }
 
         public bool DeviceRecovery()
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"DEVICE: ON PORT={DeviceInformation.ComPort} - DEVICE-RECOVERY");
+            return false;
         }
 
         public List<object> GetDeviceResponse(object deviceInfo)
