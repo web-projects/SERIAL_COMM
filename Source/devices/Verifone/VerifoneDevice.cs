@@ -1,4 +1,5 @@
 ﻿using Devices.Common;
+using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Devices.Verifone.Connection;
 using Devices.Verifone.Interfaces;
@@ -20,7 +21,10 @@ namespace Devices.Verifone
     {
         public string Name => StringValueAttribute.GetStringValue(DeviceType.Verifone);
 
-        private SerialConnection serialConnection { get; }
+        //public event PublishEvent PublishEvent;
+        public event DeviceEventHandler DeviceEventOccured;
+
+        private SerialConnection serialConnection { get; set;  }
 
         private bool IsConnected { get; set; }
 
@@ -35,6 +39,7 @@ namespace Devices.Verifone
 
         public VerifoneDevice()
         {
+
         }
 
         public object Clone()
@@ -64,11 +69,11 @@ namespace Devices.Verifone
             return IsConnected;
         }
 
-        public List<object> Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
+        public void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
         {
-            //serialConnection = new SerialConnection(serialPort);
-            active = true;
-            return null;
+            DeviceInformation.ComPort = config.SerialConfig.CommPortName;
+            serialConnection = new SerialConnection(config.SerialConfig.CommPortName);
+            active = IsConnected = serialConnection.Connect();
         }
 
         public List<DeviceInformation> DiscoverDevices()
@@ -119,6 +124,9 @@ namespace Devices.Verifone
             throw new NotImplementedException();
         }
 
+        // ------------------------------------------------------------------------
+        // Methods that are mapped for usage in their respective sub-workflows.
+        // ------------------------------------------------------------------------
         #region --- subworkflow mapping
         public object GetStatus(object request)
         {

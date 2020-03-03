@@ -39,7 +39,7 @@ namespace Devices.Verifone.Connection
         internal VIPADevice.ResponseTaglessHandlerDelegate ResponseTaglessHandler = null;
         internal VIPADevice.ResponseCLessHandlerDelegate ResponseContactlessHandler = null;
 
-        #endregion
+        #endregion --- attributes ---
 
         #region --- private methods ---
 

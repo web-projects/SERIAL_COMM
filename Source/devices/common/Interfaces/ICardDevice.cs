@@ -10,7 +10,7 @@ namespace Devices.Common.Interfaces
     public interface ICardDevice : ICloneable
     {
         //event PublishEvent PublishEvent;
-        //event DeviceEventHandler DeviceEventOccured;
+        event DeviceEventHandler DeviceEventOccured;
 
         string Name { get; }
 
@@ -24,7 +24,7 @@ namespace Devices.Common.Interfaces
 
         List<DeviceInformation> DiscoverDevices();
 
-        List<object> Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool dalActive);
+        void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool dalActive);
 
         void DeviceSetIdle();
 

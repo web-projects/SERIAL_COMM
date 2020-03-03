@@ -1,4 +1,5 @@
 ﻿using DEVICE_CORE.Helpers;
+using Devices.Common.Helpers;
 using System;
 
 namespace DEVICE_CORE.SerialPort

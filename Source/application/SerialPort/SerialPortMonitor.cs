@@ -1,5 +1,7 @@
 ﻿using DEVICE_CORE.Helpers;
 using DEVICE_CORE.SerialPort.Interfaces;
+using Devices.Common;
+using Devices.Common.Helpers;
 using System;
 using System.Linq;
 using System.Management;

@@ -10,6 +10,7 @@ using DEVICE_CORE.StateMachine.State.Interfaces;
 using DEVICE_CORE.StateMachine.State.Providers;
 using DEVICE_SDK.Sdk;
 using Devices.Common;
+using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Ninject;
 using System;
@@ -56,7 +57,7 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         //public IListenerConnector Connector { get; private set; }
 
-        //public List<ICardDevice> AvailableCardDevices { get; private set; } = new List<ICardDevice>();
+        public List<ICardDevice> AvailableCardDevices { get; private set; } = new List<ICardDevice>();
 
         public string PluginPath { get; private set; }
 
@@ -140,21 +141,15 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public void SetPublishEventHandlerAsTask()
         {
-            //    if (TargetDevice != null)
-            //    {
-            //        NeedsDeviceRecovery = false;
-            //        TargetDevice.PublishEvent += PublishEventHandlerAsTask;
-            //        TargetDevice.DeviceEventOccured += OnDeviceEventReceived;
-            //    }
-            //    else if (TargetDevices != null)
-            //    {
-            //        foreach (var device in TargetDevices)
-            //        {
-            //            NeedsDeviceRecovery = false;
-            //            device.PublishEvent += PublishEventHandlerAsTask;
-            //            device.DeviceEventOccured += OnDeviceEventReceived;
-            //        }
-            //    }
+            if (TargetDevices != null)
+            {
+                foreach (var device in TargetDevices)
+                {
+                    NeedsDeviceRecovery = false;
+                    //device.PublishEvent += PublishEventHandlerAsTask;
+                    device.DeviceEventOccured += OnDeviceEventReceived;
+                }
+            }
         }
 
         public void SaveState(object stateObject) => savedStackState.Push(stateObject);
@@ -197,14 +192,14 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         private void OnDeviceEventReceived(DeviceEvent deviceEvent, DeviceInformation deviceInformation)
         {
-            //    if (currentStateAction.WorkflowStateType == SubWorkflowIdleState)
-            //    {
+            //if (currentStateAction.WorkflowStateType == SubWorkflowIdleState)
+            //{
             //        if (subStateController != null)
             //        {
             //            IDeviceSubStateManager subStateManager = subStateController as IDALSubStateManager;
             //            subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
             //        }
-            //    }
+            //}
         }
 
         private void OnComPortEventReceived(PortEventType comPortEvent, string portNumber)
@@ -216,19 +211,21 @@ namespace DEVICE_CORE.StateMachine.State.Management
             }
             else if (comPortEvent == PortEventType.Removal)
             {
-                //if (TargetDevices != null)
-                //{
-                //    // dispose of all connections so that device recovery re-validates them
-                //    foreach (var device in TargetDevices)
-                //    {
-                //        if (string.Equals(portNumber, device.DeviceInformation.ComPort, StringComparison.CurrentCultureIgnoreCase))
-                //        {
-                //            _ = LoggingClient.LogInfoAsync($"Comport unplugged. ComportNumber '{portNumber}', " +
-                //                $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
-                //        }
-                //        device.Dispose();
-                //    }
-                //}
+                if (TargetDevices != null)
+                {
+                    // dispose of all connections so that device recovery re-validates them
+                    foreach (var device in TargetDevices)
+                    {
+                        if (string.Equals(portNumber, device.DeviceInformation.ComPort, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            //_ = LoggingClient.LogInfoAsync($"Comport unplugged. ComportNumber '{portNumber}', " +
+                            //    $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
+                            Console.WriteLine($"Comport unplugged. ComportNumber '{portNumber}', " +
+                                $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
+                        }
+                        device.Dispose();
+                    }
+                }
                 //else
                 //{
                 //_ = LoggingClient.LogInfoAsync($"Comport unplugged. ComportNumber '{portNumber}', " +

@@ -2,6 +2,7 @@
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using Devices.Common;
+using Devices.Common.Helpers;
 using System.Threading.Tasks;
 
 namespace DEVICE_CORE.StateMachine.State.Actions
@@ -28,7 +29,7 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             if (Controller != null)
             {
                 //Controller.RequestReceived -= RequestReceived;
-                //Controller.DeviceEventReceived -= DeviceEventReceived;
+                Controller.DeviceEventReceived -= DeviceEventReceived;
                 Controller.ComPortEventReceived -= ComportEventReceived;
             }
         }

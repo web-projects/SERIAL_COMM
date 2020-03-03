@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Devices.Common;
+using System;
 
 namespace DEVICE_CORE.SerialPort.Interfaces
 {

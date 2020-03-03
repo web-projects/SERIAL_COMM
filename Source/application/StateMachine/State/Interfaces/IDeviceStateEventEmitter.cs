@@ -1,5 +1,6 @@
 ﻿using DEVICE_CORE.SerialPort.Interfaces;
 using DEVICE_CORE.StateMachine.State.Enums;
+using Devices.Common;
 
 namespace DEVICE_CORE.StateMachine.State.Interfaces
 {
