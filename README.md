@@ -34,8 +34,8 @@ This an applicationto test Serial Communication.
 * 20191231 - Cleaned up port detection logic.
 * 20200227 - Added DeviceManager.
 * 20200228 - Added Polly for timeout management.
-           - Added AbortCommand logic.
-           - StateMachine initial.
+-          - Added AbortCommand logic.
+-          - StateMachine initial.
 * 20200229 - Added Application Provider.
 * 20200301 - StateMachine part 2.
 * 20200302 - Device Addition.
