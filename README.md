@@ -38,3 +38,4 @@ This an applicationto test Serial Communication.
            - StateMachine initial.
 * 20200229 - Added Application Provider.
 * 20200301 - StateMachine part 2.
+* 20200302 - Device Addition.
