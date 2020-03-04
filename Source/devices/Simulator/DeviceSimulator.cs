@@ -9,6 +9,7 @@ using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Devices.Simulator.Connection;
 using Ninject;
+using XO.Requests;
 
 namespace Devices.Simulator
 {
@@ -28,7 +29,7 @@ namespace Devices.Simulator
         //public event PublishEvent PublishEvent;
         public event DeviceEventHandler DeviceEventOccured;
 
-        public List<object> GetDeviceResponse(object deviceInfo)
+        public List<LinkRequest> GetDeviceResponse(LinkRequest deviceInfo)
         {
             return null;
         }
@@ -117,17 +118,17 @@ namespace Devices.Simulator
         // Methods that are mapped for usage in their respective sub-workflows.
         // ------------------------------------------------------------------------
         #region --- subworkflow mapping
-        public object GetStatus(object request)
+        public LinkRequest GetStatus(LinkRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public object AbortCommand(object request)
+        public LinkRequest AbortCommand(LinkRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public object ResetDevice(object request)
+        public LinkRequest ResetDevice(LinkRequest request)
         {
             throw new NotImplementedException();
         }

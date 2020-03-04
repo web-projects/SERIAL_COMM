@@ -1,8 +1,7 @@
-﻿using DEVICE_CORE.SerialPort.Interfaces;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using DEVICE_CORE.StateMachine.State.Enums;
 using Devices.Common;
 
-namespace DEVICE_CORE.StateMachine.State.Interfaces
+namespace DEVICE_CORE.State.Interfaces
 {
     //public delegate void OnRequestReceived(LinkRequest request);
     public delegate void OnRequestReceived(object request);
@@ -14,9 +13,7 @@ namespace DEVICE_CORE.StateMachine.State.Interfaces
         event OnRequestReceived RequestReceived;
         event OnWorkflowStopped WorkflowStopped;
         event OnStateChange StateChange;
-
         DeviceEventHandler DeviceEventReceived { get; set; }
-
         ComPortEventHandler ComPortEventReceived { get; set; }
     }
 }

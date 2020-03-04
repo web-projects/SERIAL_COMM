@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Source\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\..\..\Source\devices\Verifone\Devices.Verifone.csproj" />
-    <ProjectReference Include="..\..\..\Source\devices\verifone\VerifoneDevice.csproj" />
   </ItemGroup>
 
 </Project>

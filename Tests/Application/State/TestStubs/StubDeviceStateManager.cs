@@ -1,5 +1,8 @@
 ﻿using DEVICE_CORE.Config;
 using DEVICE_CORE.SerialPort.Interfaces;
+using DEVICE_CORE.State.Interfaces;
+using DEVICE_CORE.State.Providers;
+using DEVICE_CORE.State.SubWorkflows.Management;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State;
 using DEVICE_CORE.StateMachine.State.Actions;
@@ -62,20 +65,20 @@ namespace DEVICE_CORE.Tests.State.TestStubs
             return null;
         }
 
-        //public IControllerVisitorProvider GetCurrentVisitorProvider()
-        //{
-        //    return null;
-        //}
+        public IControllerVisitorProvider GetCurrentVisitorProvider()
+        {
+            return null;
+        }
 
-        //public IDeviceSubStateManager GetSubStateManagerProvider()
-        //{
-        //    return null;
-        //}
+        public IDeviceSubStateManager GetSubStateManagerProvider()
+        {
+            return null;
+        }
 
-        //ISubStateManagerProvider IDeviceStateController.GetSubStateManagerProvider()
-        //{
-        //    return null;
-        //}
+        ISubStateManagerProvider IDeviceStateController.GetSubStateManagerProvider()
+        {
+            return null;
+        }
 
         public void LaunchWorkflow()
         {

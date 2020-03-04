@@ -4,6 +4,7 @@ using DEVICE_CORE.StateMachine.State.Interfaces;
 using DEVICE_CORE.StateMachine.State.SubWorkflows;
 using System;
 using System.Threading.Tasks;
+using XO.Requests;
 
 namespace DEVICE_CORE.StateMachine.State.Actions
 {
@@ -22,15 +23,13 @@ namespace DEVICE_CORE.StateMachine.State.Actions
              **/
             if (StateObject != null)
             {
-                //await ProcessListenerRequest(StateObject as LinkRequest);
-                await ProcessListenerRequest(StateObject as object);
+                await ProcessListenerRequest(StateObject as LinkRequest);
             }
 
             _ = Complete(this);
         }
 
-        //private async Task ProcessListenerRequest(LinkRequest linkRequest)
-        private async Task ProcessListenerRequest(object linkRequest)
+        private async Task ProcessListenerRequest(LinkRequest linkRequest)
         {
             try
             {

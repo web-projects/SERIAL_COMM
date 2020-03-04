@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using XO.Requests;
 
 namespace Devices.Verifone
 {
@@ -113,7 +114,7 @@ namespace Devices.Verifone
             return false;
         }
 
-        public List<object> GetDeviceResponse(object deviceInfo)
+        public List<LinkRequest> GetDeviceResponse(LinkRequest deviceInfo)
         {
             throw new NotImplementedException();
         }
@@ -122,17 +123,17 @@ namespace Devices.Verifone
         // Methods that are mapped for usage in their respective sub-workflows.
         // ------------------------------------------------------------------------
         #region --- subworkflow mapping
-        public object GetStatus(object request)
+        public LinkRequest GetStatus(LinkRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public object AbortCommand(object request)
+        public LinkRequest AbortCommand(LinkRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public object ResetDevice(object request)
+        public LinkRequest ResetDevice(LinkRequest request)
         {
             throw new NotImplementedException();
         }

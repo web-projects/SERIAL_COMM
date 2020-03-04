@@ -1,12 +1,15 @@
-﻿using XO.Requests;
+﻿using DEVICE_CORE.Helpers;
 using DEVICE_CORE.StateMachine.State;
 using DEVICE_CORE.StateMachine.State.Enums;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Helpers;
 using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using XO.Device;
+using XO.Requests;
 
 namespace DEVICE_CORE.State.SubWorkflows.Actions
 {
@@ -19,7 +22,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
 
         public abstract DeviceSubWorkflowState WorkflowStateType { get; }
 
-        public object StateObject { get; private set; }
+        public LinkRequest StateObject { get; private set; }
 
         public CancellationToken CancellationToken { get; private set; }
 
@@ -79,11 +82,6 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
 
         public ICardDevice FindTargetDevice(LinkDeviceIdentifier deviceIdentifier)
         {
-            if (Controller.TargetDevice != null)
-            {
-                return Controller.TargetDevice;
-            }
-
             if (deviceIdentifier == null)
             {
                 return null;

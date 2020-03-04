@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using XO.Requests;
 
 namespace Devices.Common.Interfaces
 {
@@ -32,13 +33,13 @@ namespace Devices.Common.Interfaces
 		
         void Dispose();
 
-        List<object> GetDeviceResponse(object deviceInfo);
+        List<LinkRequest> GetDeviceResponse(LinkRequest deviceInfo);
 
         // ------------------------------------------------------------------------
         // Methods that are mapped for usage in their respective sub-workflows.
         // ------------------------------------------------------------------------
-        object GetStatus(object request);
-        object AbortCommand(object request);
-        object ResetDevice(object request);
+        LinkRequest GetStatus(LinkRequest request);
+        LinkRequest AbortCommand(LinkRequest request);
+        LinkRequest ResetDevice(LinkRequest request);
     }
 }

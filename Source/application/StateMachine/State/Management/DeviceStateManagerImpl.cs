@@ -2,6 +2,10 @@
 using DEVICE_CORE.Helpers;
 using DEVICE_CORE.Providers;
 using DEVICE_CORE.SerialPort.Interfaces;
+using DEVICE_CORE.State.Interfaces;
+using DEVICE_CORE.State.Providers;
+using DEVICE_CORE.State.SubWorkflows;
+using DEVICE_CORE.State.SubWorkflows.Management;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_CORE.StateMachine.State.Actions.Controllers;
@@ -19,8 +23,7 @@ using System.Threading.Tasks;
 
 namespace DEVICE_CORE.StateMachine.State.Management
 {
-    //internal class DeviceStateManagerImpl :  IInitializable, IDeviceStateController, IDeviceStateManager,ISubWorkflowHook
-    internal class DeviceStateManagerImpl : IInitializable, IDeviceStateController, IDeviceStateManager
+    internal class DeviceStateManagerImpl :  IInitializable, IDeviceStateController, IDeviceStateManager, ISubWorkflowHook
     {
         private bool disposed;
 
@@ -39,11 +42,11 @@ namespace DEVICE_CORE.StateMachine.State.Management
         [Inject]
         public IDeviceStateActionControllerProvider DeviceStateActionControllerProvider { get; set; }
 
-        //[Inject]
-        //public IControllerVisitorProvider ControllerVisitorProvider { get; set; }
+        [Inject]
+        public IControllerVisitorProvider ControllerVisitorProvider { get; set; }
 
-        //[Inject]
-        //public ISubStateManagerProvider SubStateManagerProvider { get; set; }
+        [Inject]
+        public ISubStateManagerProvider SubStateManagerProvider { get; set; }
 
         [Inject]
         public ISerialPortMonitor SerialPortMonitor { get; set; }
@@ -61,8 +64,6 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public string PluginPath { get; private set; }
 
-        //public ICardDevice TargetDevice { get; private set; }
-
         public List<ICardDevice> TargetDevices { get; private set; }
 
         public DeviceEventHandler DeviceEventReceived { get; set; }
@@ -78,7 +79,8 @@ namespace DEVICE_CORE.StateMachine.State.Management
         public bool DeviceListenerIsOnline { get; set; }
 
         private static bool subscribed { get; set; }
-        //private IDeviceSubStateController subStateController;
+        
+        private IDeviceSubStateController subStateController;
         private IDeviceStateAction currentStateAction;
         private IDeviceStateActionController stateActionController;
         private readonly Stack<object> savedStackState = new Stack<object>();
@@ -114,19 +116,6 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public void SetPluginPath(string pluginPath) => (PluginPath) = (pluginPath);
 
-        //public void SetTargetDevice(ICardDevice targetDevice)
-        //{
-        //    if (TargetDevices != null)
-        //    {
-        //        foreach (var device in TargetDevices)
-        //        {
-        //            device?.Dispose();
-        //        }
-        //    }
-        //    TargetDevice?.Dispose();
-        //    TargetDevice = targetDevice;
-        //}
-
         public void SetTargetDevices(List<ICardDevice> targetDevices)
         {
             if (TargetDevices != null)
@@ -160,15 +149,15 @@ namespace DEVICE_CORE.StateMachine.State.Management
             await AdvanceActionWithState(state);
         }
 
-        //public void Hook(IDeviceSubStateController controller) => subStateController = (controller);
+        public void Hook(IDeviceSubStateController controller) => subStateController = (controller);
 
-        //public void UnHook() => subStateController = (null);
+        public void UnHook() => subStateController = (null);
 
-        //public IControllerVisitorProvider GetCurrentVisitorProvider() => ControllerVisitorProvider;
+        public IControllerVisitorProvider GetCurrentVisitorProvider() => ControllerVisitorProvider;
 
         public IDeviceCancellationBroker GetCancellationBroker() => DeviceCancellationBrokerProvider.GetDeviceCancellationBroker();
 
-        //public ISubStateManagerProvider GetSubStateManagerProvider() => SubStateManagerProvider;
+        public ISubStateManagerProvider GetSubStateManagerProvider() => SubStateManagerProvider;
 
         //protected void RaiseOnRequestReceived(string data)
         //{
@@ -192,14 +181,14 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         private void OnDeviceEventReceived(DeviceEvent deviceEvent, DeviceInformation deviceInformation)
         {
-            //if (currentStateAction.WorkflowStateType == SubWorkflowIdleState)
-            //{
-            //        if (subStateController != null)
-            //        {
-            //            IDeviceSubStateManager subStateManager = subStateController as IDALSubStateManager;
-            //            subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
-            //        }
-            //}
+            if (currentStateAction.WorkflowStateType == DeviceWorkflowState.SubWorkflowIdleState)
+            {
+                    if (subStateController != null)
+                    {
+                        IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
+                        subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
+                    }
+            }
         }
 
         private void OnComPortEventReceived(PortEventType comPortEvent, string portNumber)

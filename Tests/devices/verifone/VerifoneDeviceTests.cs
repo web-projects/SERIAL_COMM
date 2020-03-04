@@ -3,6 +3,7 @@ using Devices.Verifone;
 using Devices.Verifone.Connection;
 using Moq;
 using Ninject;
+using XO.Requests;
 using Xunit;
 
 namespace Devices.Simulator.Tests
@@ -58,7 +59,7 @@ namespace Devices.Simulator.Tests
         [Fact]
         public void GetStatus_ThrowsNotImplemented_WhenCalled()
         {
-            object objRequest = new object();
+            LinkRequest objRequest = new LinkRequest();
             Assert.Throws<System.NotImplementedException>(() => subject.GetStatus(objRequest));
         }
     }

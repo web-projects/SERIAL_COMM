@@ -15,10 +15,10 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions.Controllers
             new Dictionary<DeviceSubWorkflowState, Func<IDeviceSubStateController, IDeviceSubStateAction>>(
                 new Dictionary<DeviceSubWorkflowState, Func<IDeviceSubStateController, IDeviceSubStateAction>>
                 {
-                    [AbortCommand] = (IDeviceSubStateController _) => new AbortCommandSubStateAction(_),
-                    [ResetCommand] = (IDeviceSubStateController _) => new ResetCommandSubStateAction(_),
+                    [AbortCommand] = (IDeviceSubStateController _) => new DeviceAbortCommandSubStateAction(_),
+                    [ResetCommand] = (IDeviceSubStateController _) => new DeviceResetCommandSubStateAction(_),
                     [SanityCheck] = (IDeviceSubStateController _) => new DeviceSanityCheckSubStateAction(_),
-                    [RequestComplete] = (IDeviceSubStateController _) => new RequestCompleteSubStateAction(_)
+                    [RequestComplete] = (IDeviceSubStateController _) => new DeviceRequestCompleteSubStateAction(_)
                 }
         );
 

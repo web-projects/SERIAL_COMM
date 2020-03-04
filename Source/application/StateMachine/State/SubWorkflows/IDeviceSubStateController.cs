@@ -5,6 +5,7 @@ using DEVICE_CORE.StateMachine.State;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using System.Collections.Generic;
+using XO.Requests;
 
 namespace DEVICE_CORE.State.SubWorkflows
 {
@@ -13,11 +14,10 @@ namespace DEVICE_CORE.State.SubWorkflows
         DeviceSection Configuration { get; }
         //ILoggingServiceClient LoggingClient { get; }
         //IListenerConnector Connector { get; }
-        ICardDevice TargetDevice { get; }
         List<ICardDevice> TargetDevices { get; }
         bool DidTimeoutOccur { get; }
         public DeviceEvent DeviceEvent { get; }
-        void SaveState(object stateObject);
+        void SaveState(LinkRequest stateObject);
         IDeviceCancellationBroker GetDeviceCancellationBroker();
     }
 }

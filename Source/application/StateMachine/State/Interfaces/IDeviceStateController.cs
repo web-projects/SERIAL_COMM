@@ -1,5 +1,7 @@
 ﻿using DEVICE_CORE.Config;
 using DEVICE_CORE.SerialPort.Interfaces;
+using DEVICE_CORE.State.Interfaces;
+using DEVICE_CORE.State.Providers;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_SDK.Sdk;
@@ -19,13 +21,12 @@ namespace DEVICE_CORE.StateMachine.State.Interfaces
         //PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
         //ILoggingServiceClient LoggingClient { get; }
         //IListenerConnector Connector { get; }
-        //List<ICardDevice> AvailableCardDevices { get; }
-        //void SetTargetDevice(ICardDevice targetDevice);
+        List<ICardDevice> AvailableCardDevices { get; }
         void SetTargetDevices(List<ICardDevice> targetDevices);
         void SetPublishEventHandlerAsTask();
         void SaveState(object stateObject);
-        //IControllerVisitorProvider GetCurrentVisitorProvider();
-        //ISubStateManagerProvider GetSubStateManagerProvider();
+        IControllerVisitorProvider GetCurrentVisitorProvider();
+        ISubStateManagerProvider GetSubStateManagerProvider();
         IDeviceCancellationBroker GetCancellationBroker();
     }
 }

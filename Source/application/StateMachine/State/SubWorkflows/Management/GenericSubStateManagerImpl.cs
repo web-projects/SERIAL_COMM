@@ -1,7 +1,9 @@
 ﻿using DEVICE_CORE.Config;
+using DEVICE_CORE.State.Interfaces;
 using DEVICE_CORE.State.SubWorkflows.Actions;
 using DEVICE_CORE.State.SubWorkflows.Actions.Controllers;
 using DEVICE_CORE.State.SubWorkflows.Providers;
+using DEVICE_CORE.State.Visitors;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
@@ -13,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using XO.Requests;
 
 namespace DEVICE_CORE.State.SubWorkflows.Management
 {
@@ -31,7 +34,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Management
         public DeviceEvent DeviceEvent { get; private set; }
 
         private readonly IDeviceStateController context;
-        private readonly Stack<object> savedStackState = new Stack<object>();
+        private readonly Stack<LinkRequest> savedStackState = new Stack<LinkRequest>();
 
         private Timer globalExecutionTimer;
         private WorkflowOptions launchOptions;
@@ -117,7 +120,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Management
             }
         }
 
-        public void SaveState(object stateObject) => savedStackState.Push(stateObject);
+        public void SaveState(LinkRequest stateObject) => savedStackState.Push(stateObject);
 
         public IDeviceCancellationBroker GetDeviceCancellationBroker() => context.GetCancellationBroker();
 

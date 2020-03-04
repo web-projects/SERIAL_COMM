@@ -1,8 +1,13 @@
-﻿using DEVICE_CORE.StateMachine.Cancellation;
+﻿using DEVICE_CORE.Helpers;
+using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Enums;
 using Devices.Common.Helpers;
+using Devices.Common.Interfaces;
+using LinkRequestExtensions;
+using System;
 using System.Threading.Tasks;
-
+using XO.Device;
+using XO.Requests;
 using static DEVICE_CORE.StateMachine.State.Enums.DeviceSubWorkflowState;
 
 namespace DEVICE_CORE.State.SubWorkflows.Actions
@@ -20,36 +25,22 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
                 // recover device to idle
                 IDeviceCancellationBroker cancellationBroker = Controller.GetDeviceCancellationBroker();
 
-                if (Controller.TargetDevice != null)
+                LinkRequest linkRequest = StateObject as LinkRequest;
+                LinkDeviceIdentifier deviceIdentifier = linkRequest.GetDeviceIdentifier();
+
+                ICardDevice cardDevice = FindTargetDevice(deviceIdentifier);
+                if (cardDevice != null)
                 {
                     var timeoutPolicy = await cancellationBroker.ExecuteWithTimeoutAsync<bool>(
-                                        _ => Controller.TargetDevice.DeviceRecovery(),
-                                        Timeouts.DALDeviceRecoveryTimeout,
+                                        _ => cardDevice.DeviceRecovery(),
+                                        DeviceConstants.DeviceRecoveryTimeout,
                                         this.CancellationToken);
 
                     if (timeoutPolicy.Outcome == Polly.OutcomeType.Failure)
                     {
-                        _ = Controller.LoggingClient.LogErrorAsync("Unable to recover device.");
+                        //_ = Controller.LoggingClient.LogErrorAsync("Unable to recover device.");
+                        Console.WriteLine("Unable to recover device.");
                     }
-                }
-                else
-                {
-                    //LinkRequest linkRequest = StateObject as LinkRequest;
-                    //LinkDeviceIdentifier deviceIdentifier = linkRequest.GetDeviceIdentifier();
-
-                    //ICardDevice cardDevice = FindTargetDevice(deviceIdentifier);
-                    //if (cardDevice != null)
-                    //{
-                    //    var timeoutPolicy = await cancellationBroker.ExecuteWithTimeoutAsync<bool>(
-                    //                        _ => cardDevice.DeviceRecovery(),
-                    //                        Timeouts.DALDeviceRecoveryTimeout,
-                    //                        this.CancellationToken);
-
-                    //    if (timeoutPolicy.Outcome == Polly.OutcomeType.Failure)
-                    //    {
-                    //        _ = Controller.LoggingClient.LogErrorAsync("Unable to recover device.");
-                    //    }
-                    //}
                 }
             }
 

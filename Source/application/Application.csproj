@@ -27,10 +27,11 @@
   <ItemGroup>
     <Folder Include="SerialPort\Interfaces\" />
     <Folder Include="StateMachine\Cancellation\" />
-    <Folder Include="StateMachine\State\SubWorkflows\Helpers\" />
+    <Folder Include="StateMachine\State\Visitors\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\common\XO.csproj" />
     <ProjectReference Include="..\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\devices\sdk\Devices.SDK.csproj" />
   </ItemGroup>

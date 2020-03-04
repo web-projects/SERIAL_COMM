@@ -41,3 +41,4 @@ This an applicationto test Serial Communication.
 * 20200302 - Device Addition.
 * 20200302 - Simulator device added.
 * 20200303 - Comm port fixes.
+* 20200404 - Added subworkflows.

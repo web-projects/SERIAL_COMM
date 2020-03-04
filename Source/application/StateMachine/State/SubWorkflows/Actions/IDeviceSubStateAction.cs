@@ -4,6 +4,7 @@ using DEVICE_CORE.StateMachine.State.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using XO.Requests;
 
 namespace DEVICE_CORE.State.SubWorkflows.Actions
 {
