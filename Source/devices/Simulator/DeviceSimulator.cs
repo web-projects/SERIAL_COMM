@@ -8,6 +8,7 @@ using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Devices.Simulator.Connection;
+using Ninject;
 
 namespace Devices.Simulator
 {
@@ -19,7 +20,8 @@ namespace Devices.Simulator
 
         public int SortOrder { get; set; } = -1;
 
-        private SerialConnection serialConnection { get; set;  }
+        [Inject]
+        private ISerialConnection serialConnection { get; set;  }
 
         private bool IsConnected { get; set; }
 

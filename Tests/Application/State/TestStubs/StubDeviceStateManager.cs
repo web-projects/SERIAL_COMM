@@ -1,10 +1,13 @@
 ﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.Connection.Interfaces;
+using DEVICE_CORE.SerialPort.Interfaces;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State;
 using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using DEVICE_CORE.StateMachine.State.Management;
+using DEVICE_SDK.Sdk;
+using Devices.Common;
+using Devices.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,13 +18,13 @@ namespace DEVICE_CORE.Tests.State.TestStubs
     {
         public string PluginPath => throw new NotImplementedException();
 
-        //public ICardDevice TargetDevice => throw new NotImplementedException();
+        public ICardDevice TargetDevice => throw new NotImplementedException();
 
-        //public List<ICardDevice> TargetDevices => throw new NotImplementedException();
+        public List<ICardDevice> TargetDevices => throw new NotImplementedException();
 
         public DeviceSection Configuration => throw new NotImplementedException();
 
-        //public IDevicePluginLoader DevicePluginLoader { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IDevicePluginLoader DevicePluginLoader { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool NeedsDeviceRecovery { get; set; }
 
@@ -29,7 +32,7 @@ namespace DEVICE_CORE.Tests.State.TestStubs
 
         //public IListenerConnector Connector => throw new NotImplementedException();
 
-        //public List<ICardDevice> AvailableCardDevices => throw new NotImplementedException();
+        public List<ICardDevice> AvailableCardDevices => throw new NotImplementedException();
 
         public ISerialPortMonitor SerialPortMonitor => throw new NotImplementedException();
 
@@ -51,7 +54,7 @@ namespace DEVICE_CORE.Tests.State.TestStubs
         }
 
         public Task Complete(IDeviceStateAction state) => Task.CompletedTask;
- 
+
         public Task Error(IDeviceStateAction state) => Task.CompletedTask;
 
         public IDeviceCancellationBroker GetCancellationBroker()
@@ -94,15 +97,10 @@ namespace DEVICE_CORE.Tests.State.TestStubs
 
         }
 
-        //public void SetTargetDevice(ICardDevice targetDevice)
-        //{
+        public void SetTargetDevices(List<ICardDevice> targetDevices)
+        {
 
-        //}
-
-        //public void SetTargetDevices(List<ICardDevice> targetDevices)
-        //{
-
-        //}
+        }
 
         public void StopWorkflow()
         {

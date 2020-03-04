@@ -246,6 +246,8 @@ namespace Devices.Verifone.Connection
 
         public bool Connect(bool exposeExceptions = false)
         {
+            connected = false;
+
             try
             {
                 // Setup read thread
@@ -277,7 +279,7 @@ namespace Devices.Verifone.Connection
 
                 Console.WriteLine($"SERIAL: ON PORT={commPort} - CONNECTION OPEN");
 
-                return connected = true;
+                connected = true;
             }
             catch (Exception e)
             {
@@ -289,7 +291,7 @@ namespace Devices.Verifone.Connection
                 }
             }
 
-            return false;
+            return connected;
         }
 
         public void Disconnect(bool exposeExceptions = false)
@@ -309,7 +311,6 @@ namespace Devices.Verifone.Connection
                     serialPort.DiscardOutBuffer();
 
                     serialPort.Close();
-                    serialPort = null;
                 }
                 catch (Exception)
                 {

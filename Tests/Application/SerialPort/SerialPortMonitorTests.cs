@@ -1,5 +1,5 @@
-﻿using DEVICE_CORE.Connection.Interfaces;
-using DEVICE_CORE.Connection.SerialPort;
+﻿using DEVICE_CORE.SerialPort;
+using DEVICE_CORE.SerialPort.Interfaces;
 using System;
 using System.Management;
 using TestHelper;

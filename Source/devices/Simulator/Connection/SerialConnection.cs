@@ -22,7 +22,7 @@ namespace Devices.Simulator.Connection
         private Thread readThread;
         private bool readContinue = true;
 
-        private System.IO.Ports.SerialPort serialPort;
+        private SerialPort serialPort;
 
         private readonly Object ReadResponsesBytesLock = new object();
         private byte[] ReadResponsesBytes = Array.Empty<byte>();
@@ -96,13 +96,15 @@ namespace Devices.Simulator.Connection
 
         public bool Connect(bool exposeExceptions = false)
         {
+            connected = false;
+
             try
             {
                 // Setup read thread
                 readThread = new Thread(ReadResponseBytes);
 
                 // Create a new SerialPort object with default settings.
-                serialPort = new System.IO.Ports.SerialPort(commPort);
+                serialPort = new SerialPort(commPort);
 
                 // Update the Handshake
                 serialPort.Handshake = Handshake.None;
@@ -126,7 +128,7 @@ namespace Devices.Simulator.Connection
 
                 readThread.Start();
 
-                return connected = true;
+               connected = true;
             }
             catch (Exception e)
             {
@@ -138,7 +140,7 @@ namespace Devices.Simulator.Connection
                 }
             }
 
-            return false;
+            return connected;
         }
 
         public void Disconnect(bool exposeExceptions = false)
@@ -150,11 +152,14 @@ namespace Devices.Simulator.Connection
                     readContinue = false;
                     Thread.Sleep(1000);
 
-                    //PortsChanged -= OnPortsChanged;
+                    readThread.Join(1024);
+                    ResponseBytesHandler -= ReadResponses;
+
+                    // discard any buffered bytes
+                    serialPort.DiscardInBuffer();
+                    serialPort.DiscardOutBuffer();
 
                     serialPort.Close();
-
-                    readThread.Join(1000);
                 }
                 catch (Exception)
                 {
@@ -186,21 +191,21 @@ namespace Devices.Simulator.Connection
 
         public void Dispose()
         {
-            readContinue = false;
-            Thread.Sleep(100);
-
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            try
+            {
+                readContinue = false;
+                Thread.Sleep(100);
+                Disconnect();
+            }
+            finally
+            {
+                Dispose(true);
+            }
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            Disconnect();
-
-            if (disposing)
-            {
-                serialPort?.Dispose();
-            }
+            GC.SuppressFinalize(this);
         }
 
         #endregion

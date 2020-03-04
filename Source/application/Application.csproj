@@ -27,7 +27,7 @@
   <ItemGroup>
     <Folder Include="SerialPort\Interfaces\" />
     <Folder Include="StateMachine\Cancellation\" />
-    <Folder Include="StateMachine\State\SubWorkflows\" />
+    <Folder Include="StateMachine\State\SubWorkflows\Helpers\" />
   </ItemGroup>
 
   <ItemGroup>

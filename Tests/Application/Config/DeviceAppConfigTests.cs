@@ -3,7 +3,7 @@ using DEVICE_CORE.Tests.Helpers;
 using System;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.Config
+namespace DEVICE_CORE.Config.Tests
 {
     public class DeviceAppConfigTests
     {
