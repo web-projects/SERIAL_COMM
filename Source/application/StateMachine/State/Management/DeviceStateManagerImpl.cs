@@ -239,16 +239,16 @@ namespace DEVICE_CORE.StateMachine.State.Management
             {
                 currentStateAction.DoDeviceDiscovery();
             }
-            //else
-            //{
-            //    StateActionRules.NeedsDeviceRecovery = true;
+            else
+            {
+                StateActionRules.NeedsDeviceRecovery = true;
 
-            //    if (subStateController != null)
-            //    {
-            //        IDeviceSubStateManager subStateManager = subStateController as IDALSubStateManager;
-            //        subStateManager.ComportEventReceived(comPortEvent, portNumber);
-            //    }
-            //}
+                if (subStateController != null)
+                {
+                    IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
+                    subStateManager.ComportEventReceived(comPortEvent, portNumber);
+                }
+            }
         }
 
         private void OnQueueEventOcurred()

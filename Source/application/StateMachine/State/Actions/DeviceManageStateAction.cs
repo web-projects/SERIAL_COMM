@@ -24,40 +24,43 @@ namespace DEVICE_CORE.StateMachine.State.Actions
 
         private async void PostRequest()
         {
-            await Task.Delay(4096);
-
-            // DEVICE RESET COMMAND
-            LinkRequest linkRequest = new LinkRequest()
+            if (Controller.TargetDevices != null)
             {
-                MessageID = RandomGenerator.BuildRandomString(12),
-                Actions = new System.Collections.Generic.List<LinkActionRequest>()
+                await Task.Delay(10240);
+
+                // DEVICE RESET COMMAND
+                LinkRequest linkRequest = new LinkRequest()
                 {
-                    new LinkActionRequest()
+                    MessageID = RandomGenerator.BuildRandomString(12),
+                    Actions = new System.Collections.Generic.List<LinkActionRequest>()
                     {
-                        Action = LinkAction.DALAction,
-                        DeviceActionRequest = new LinkDeviceActionRequest()
+                        new LinkActionRequest()
                         {
-                            DeviceAction = lastDeviceAction
-                        },
-                        DeviceRequest = new LinkDeviceRequest()
-                        {
-                            DeviceIdentifier = new XO.Device.LinkDeviceIdentifier()
+                            Action = LinkAction.DALAction,
+                            DeviceActionRequest = new LinkDeviceActionRequest()
                             {
-                                Manufacturer = "Simulator",
-                                Model = "SimCity",
-                                SerialNumber = "CEEEDEADBEEF"
+                                DeviceAction = lastDeviceAction
+                            },
+                            DeviceRequest = new LinkDeviceRequest()
+                            {
+                                DeviceIdentifier = new XO.Device.LinkDeviceIdentifier()
+                                {
+                                    Manufacturer = "Simulator",
+                                    Model = "SimCity",
+                                    SerialNumber = "CEEEDEADBEEF"
+                                }
                             }
                         }
                     }
+                };
+                Console.WriteLine("----------------------------------------------------------------------------------------------------");
+                Console.WriteLine($"REQUEST: {lastDeviceAction}");
+                Controller.SendDeviceCommand(Newtonsoft.Json.JsonConvert.SerializeObject(linkRequest));
+                lastDeviceAction += 1;
+                if (lastDeviceAction >= LinkDeviceActionType.GetIdentifier)
+                {
+                    lastDeviceAction = LinkDeviceActionType.GetStatus;
                 }
-            };
-            Console.WriteLine("----------------------------------------------------------------------------------------------------");
-            Console.WriteLine($"REQUEST: {lastDeviceAction}");
-            Controller.SendDeviceCommand(Newtonsoft.Json.JsonConvert.SerializeObject(linkRequest));
-            lastDeviceAction += 1;
-            if (lastDeviceAction >= LinkDeviceActionType.GetIdentifier)
-            {
-                lastDeviceAction = LinkDeviceActionType.GetStatus;
             }
         }
 

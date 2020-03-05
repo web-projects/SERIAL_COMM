@@ -130,6 +130,10 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             {
                 Controller.SetTargetDevices(validatedCardDevices);
             }
+            else
+            {
+                Controller.SetTargetDevices(null);
+            }
 
             if (Controller.TargetDevices != null)
             {
