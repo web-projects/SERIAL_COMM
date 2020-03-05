@@ -15,6 +15,11 @@ namespace DEVICE_CORE.StateMachine.State.Enums
         Undefined,
 
         /// <summary>
+        /// Represents a state when DAL starts getting status information from the device
+        /// </summary>
+        GetStatus,
+
+        /// <summary>
         /// Represents a state when DAL aborts pending device commands
         /// </summary>
         AbortCommand,

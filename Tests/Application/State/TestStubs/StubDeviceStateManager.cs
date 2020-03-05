@@ -1,12 +1,13 @@
-﻿using DEVICE_CORE.Config;
+﻿using Core.Patterns.Queuing;
+using DEVICE_CORE.Config;
 using DEVICE_CORE.SerialPort.Interfaces;
-using DEVICE_CORE.State.Interfaces;
-using DEVICE_CORE.State.Providers;
-using DEVICE_CORE.State.SubWorkflows.Management;
+using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.State.Providers;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Management;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State;
 using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.State.Actions.Preprocessing;
 using DEVICE_CORE.StateMachine.State.Management;
 using DEVICE_SDK.Sdk;
 using Devices.Common;
@@ -43,7 +44,7 @@ namespace DEVICE_CORE.Tests.State.TestStubs
 
         ComPortEventHandler IDeviceStateEventEmitter.ComPortEventReceived { get; set; }
 
-        //public PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
+        public PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
 
         public StateActionRules StateActionRules { get; set; }
 
@@ -101,6 +102,11 @@ namespace DEVICE_CORE.Tests.State.TestStubs
         }
 
         public void SetTargetDevices(List<ICardDevice> targetDevices)
+        {
+
+        }
+
+        public void SendDeviceCommand(object message)
         {
 
         }

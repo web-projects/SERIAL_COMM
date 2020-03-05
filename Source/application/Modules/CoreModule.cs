@@ -16,8 +16,8 @@ namespace DEVICE_CORE.Modules
             Bind<IDeviceConfigurationProvider>().To<DeviceConfigurationProvider>();
             Bind<IDeviceStateActionControllerProvider>().To<DeviceStateActionControllerProvider>();
             Bind<IDeviceStateManager>().To<DeviceStateManagerImpl>();
-            //Bind<ISubStateManagerProvider>().To<SubStateManagerProviderImpl>();
-            //Bind<IControllerVisitorProvider>().To<ControllerVisitorProvider>();
+            Bind<ISubStateManagerProvider>().To<SubStateManagerProviderImpl>();
+            Bind<IControllerVisitorProvider>().To<ControllerVisitorProvider>();
             Bind<ISerialPortMonitor>().To<SerialPortMonitor>();
             Bind<IDeviceCancellationBrokerProvider>().To<DeviceCancellationBrokerProviderImpl>();
             Bind<DeviceActivator>().ToSelf();

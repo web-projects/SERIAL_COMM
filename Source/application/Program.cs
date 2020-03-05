@@ -30,18 +30,18 @@ namespace DEVICE_CORE
 
             while (keypressed != ConsoleKey.Q)
             {
-                switch(keypressed)
+                switch (keypressed)
                 {
                     case ConsoleKey.A:
-                    {
-                        Console.WriteLine("\r\nCOMMAND: [ABORT]");
-                        break;
-                    }
+                        {
+                            Console.WriteLine("\r\nCOMMAND: [ABORT]");
+                            break;
+                        }
                     case ConsoleKey.R:
-                    {
-                        Console.WriteLine("\r\nCOMMAND: [RESET]");
-                        break;
-                    }
+                        {
+                            Console.WriteLine("\r\nCOMMAND: [RESET]");
+                            break;
+                        }
                 }
 
                 await Task.Delay(50).ConfigureAwait(false);

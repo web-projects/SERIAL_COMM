@@ -1,13 +1,11 @@
 ﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.State.Interfaces;
-using DEVICE_CORE.State.SubWorkflows.Actions;
-using DEVICE_CORE.State.SubWorkflows.Actions.Controllers;
-using DEVICE_CORE.State.SubWorkflows.Providers;
-using DEVICE_CORE.State.Visitors;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
-using DEVICE_CORE.StateMachine.State.SubWorkflows;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Actions;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Controllers;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Providers;
+using DEVICE_CORE.StateMachine.State.Visitors;
 using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
@@ -17,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using XO.Requests;
 
-namespace DEVICE_CORE.State.SubWorkflows.Management
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Management
 {
     internal class GenericSubStateManagerImpl : IDeviceSubStateManager, IDeviceSubStateController, IStateControllerVisitable<ISubWorkflowHook, IDeviceSubStateController>
     {
@@ -123,6 +121,11 @@ namespace DEVICE_CORE.State.SubWorkflows.Management
         public void SaveState(LinkRequest stateObject) => savedStackState.Push(stateObject);
 
         public IDeviceCancellationBroker GetDeviceCancellationBroker() => context.GetCancellationBroker();
+
+        public void RequestReceived(LinkRequest request)
+        {
+
+        }
 
         private void ExecuteTransition()
         {

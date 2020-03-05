@@ -118,19 +118,28 @@ namespace Devices.Simulator
         // Methods that are mapped for usage in their respective sub-workflows.
         // ------------------------------------------------------------------------
         #region --- subworkflow mapping
-        public LinkRequest GetStatus(LinkRequest request)
+        public LinkRequest GetStatus(LinkRequest linkRequest)
         {
-            throw new NotImplementedException();
+            LinkActionRequest linkActionRequest = linkRequest?.Actions?.First();
+            Console.WriteLine("----------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"simulator: GET STATUS for SN='{linkActionRequest?.DeviceRequest?.DeviceIdentifier?.SerialNumber}'");
+            return linkRequest;
         }
 
-        public LinkRequest AbortCommand(LinkRequest request)
+        public LinkRequest AbortCommand(LinkRequest linkRequest)
         {
-            throw new NotImplementedException();
+            LinkActionRequest linkActionRequest = linkRequest?.Actions?.First();
+            Console.WriteLine("----------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"simulator: ABORT COMMAND for SN='{linkActionRequest?.DeviceRequest?.DeviceIdentifier?.SerialNumber}'");
+            return linkRequest;
         }
 
-        public LinkRequest ResetDevice(LinkRequest request)
+        public LinkRequest ResetDevice(LinkRequest linkRequest)
         {
-            throw new NotImplementedException();
+            LinkActionRequest linkActionRequest = linkRequest?.Actions?.First();
+            Console.WriteLine("----------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"simulator: RESET DEVICE for SN='{linkActionRequest?.DeviceRequest?.DeviceIdentifier?.SerialNumber}'");
+            return linkRequest;
         }
 
         #endregion --- subworkflow mapping

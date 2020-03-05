@@ -1,6 +1,6 @@
-﻿using DEVICE_CORE.State.SubWorkflows;
+﻿using DEVICE_CORE.StateMachine.State.SubWorkflows;
 
-namespace DEVICE_CORE.State.Interfaces
+namespace DEVICE_CORE.StateMachine.State.Interfaces
 {
     internal interface ISubWorkflowHook
     {

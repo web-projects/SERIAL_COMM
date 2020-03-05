@@ -1,29 +1,30 @@
-﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.Helpers;
+﻿using Core.Patterns.Queuing;
+using DEVICE_CORE.Config;
 using DEVICE_CORE.Providers;
 using DEVICE_CORE.SerialPort.Interfaces;
-using DEVICE_CORE.State.Interfaces;
-using DEVICE_CORE.State.Providers;
-using DEVICE_CORE.State.SubWorkflows;
-using DEVICE_CORE.State.SubWorkflows.Management;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_CORE.StateMachine.State.Actions.Controllers;
+using DEVICE_CORE.StateMachine.State.Actions.Preprocessing;
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using DEVICE_CORE.StateMachine.State.Providers;
+using DEVICE_CORE.StateMachine.State.SubWorkflows;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Management;
 using DEVICE_SDK.Sdk;
 using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
+using Newtonsoft.Json;
 using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XO.Requests;
 
 namespace DEVICE_CORE.StateMachine.State.Management
 {
-    internal class DeviceStateManagerImpl :  IInitializable, IDeviceStateController, IDeviceStateManager, ISubWorkflowHook
+    internal class DeviceStateManagerImpl : IInitializable, IDeviceStateController, IDeviceStateManager, ISubWorkflowHook
     {
         private bool disposed;
 
@@ -70,7 +71,7 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public ComPortEventHandler ComPortEventReceived { get; set; }
 
-        //public PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
+        public PriorityQueue<PriorityQueueDeviceEvents> PriorityQueue { get; set; }
 
         public StateActionRules StateActionRules { get; private set; }
 
@@ -79,7 +80,7 @@ namespace DEVICE_CORE.StateMachine.State.Management
         public bool DeviceListenerIsOnline { get; set; }
 
         private static bool subscribed { get; set; }
-        
+
         private IDeviceSubStateController subStateController;
         private IDeviceStateAction currentStateAction;
         private IDeviceStateActionController stateActionController;
@@ -91,7 +92,7 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public DeviceStateManagerImpl()
         {
-            //PriorityQueue = new PriorityQueue<PriorityQueueDeviceEvents>();
+            PriorityQueue = new PriorityQueue<PriorityQueueDeviceEvents>();
         }
 
         public void Initialize()
@@ -111,7 +112,7 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
             stateActionController = DeviceStateActionControllerProvider.GetStateActionController(this);
 
-            //InitializeConnectorEvents();
+            InitializeConnectorEvents();
         }
 
         public void SetPluginPath(string pluginPath) => (PluginPath) = (pluginPath);
@@ -159,23 +160,24 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         public ISubStateManagerProvider GetSubStateManagerProvider() => SubStateManagerProvider;
 
-        //protected void RaiseOnRequestReceived(string data)
-        //{
-        //    try
-        //    {
-        //        LogMessage("Request received from", data);
-        //        LinkRequest linkRequest = JsonConvert.DeserializeObject<LinkRequest>(data.ToString());
-        //        RequestReceived?.Invoke(linkRequest);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        LogError(e.Message, data);
-        //        if (Connector != null)
-        //        {
-        //            Connector.Publish(LinkRequestResponseError(null, "DALError", e.Message), new TopicOption[] { TopicOption.Servicer }).ConfigureAwait(false);
-        //        }
-        //    }
-        //}
+        protected void RaiseOnRequestReceived(string data)
+        {
+            try
+            {
+                LogMessage("Request received from", data);
+                LinkRequest linkRequest = JsonConvert.DeserializeObject<LinkRequest>(data.ToString());
+                RequestReceived?.Invoke(linkRequest);
+            }
+            catch (Exception e)
+            {
+                LogError(e.Message, data);
+                //if (Connector != null)
+                {
+                    //Connector.Publish(LinkRequestResponseError(null, "DALError", e.Message), new TopicOption[] { TopicOption.Servicer }).ConfigureAwait(false);
+                    Console.WriteLine($"RaisedOnRequestReceived: exception='{e.Message}'");
+                }
+            }
+        }
 
         protected void RaiseOnWorkflowStopped(DeviceWorkflowStopReason reason) => WorkflowStopped?.Invoke(reason);
 
@@ -183,11 +185,11 @@ namespace DEVICE_CORE.StateMachine.State.Management
         {
             if (currentStateAction.WorkflowStateType == DeviceWorkflowState.SubWorkflowIdleState)
             {
-                    if (subStateController != null)
-                    {
-                        IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
-                        subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
-                    }
+                if (subStateController != null)
+                {
+                    IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
+                    subStateManager.DeviceEventReceived(deviceEvent, deviceInformation);
+                }
             }
         }
 
@@ -290,32 +292,33 @@ namespace DEVICE_CORE.StateMachine.State.Management
         //    return linkRequest;
         //}
 
-        //private void LogMessage(string sendReceive, object data)
-        //{
-        //    var request = JsonConvert.DeserializeObject<LinkRequest>(data as string);
-        //    string messageId = null;
-        //    try
-        //    {
-        //        if (!string.IsNullOrWhiteSpace(request?.MessageID))
-        //        {
-        //            messageId = request.MessageID;
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        _ = LoggingClient.LogInfoAsync($"Request of MessageID: '{messageId}' {sendReceive} Listener.").ConfigureAwait(false);
-        //    }
-        //}
+        private void LogMessage(string sendReceive, object data)
+        {
+            var request = JsonConvert.DeserializeObject<LinkRequest>(data as string);
+            string messageId = null;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request?.MessageID))
+                {
+                    messageId = request.MessageID;
+                }
+            }
+            finally
+            {
+                //_ = LoggingClient.LogInfoAsync($"Request of MessageID: '{messageId}' {sendReceive} Listener.").ConfigureAwait(false);
+                Console.WriteLine($"Request of MessageID: '{messageId}' {sendReceive} Listener.");
+            }
+        }
 
-        //private void InitializeConnectorEvents()
-        //{
-        //    Connector.MessageReceived += ListenerConnector_MessageReceived;
-        //    Connector.OfflineConnectivity += ListenerConnector_OfflineConnectivity;
-        //    Connector.OnlineConnectivity += ListenerConnector_OnlineConnectivity;
-        //    Connector.ChannelClient.ChannelConnected += ChannelClient_ChannelConnected;
-        //    Connector.ChannelClient.ChannelDisconnected += ChannelClient_ChannelDisconnected;
-        //    Connector.ChannelClient.ChannelReconnected += ChannelClient_ChannelReconnected;
-        //}
+        private void InitializeConnectorEvents()
+        {
+            //    Connector.MessageReceived += ListenerConnector_MessageReceived;
+            //    Connector.OfflineConnectivity += ListenerConnector_OfflineConnectivity;
+            //    Connector.OnlineConnectivity += ListenerConnector_OnlineConnectivity;
+            //    Connector.ChannelClient.ChannelConnected += ChannelClient_ChannelConnected;
+            //    Connector.ChannelClient.ChannelDisconnected += ChannelClient_ChannelDisconnected;
+            //    Connector.ChannelClient.ChannelReconnected += ChannelClient_ChannelReconnected;
+        }
 
         private void DestroyComportMonitoring()
         {
@@ -326,30 +329,29 @@ namespace DEVICE_CORE.StateMachine.State.Management
             }
         }
 
-        //private void DestroyConnectorEvents()
-        //{
-        //    if (Connector != null)
-        //    {
-        //        Connector.MessageReceived -= ListenerConnector_MessageReceived;
-        //        Connector.OfflineConnectivity -= ListenerConnector_OfflineConnectivity;
-        //        Connector.OnlineConnectivity -= ListenerConnector_OnlineConnectivity;
+        private void DestroyConnectorEvents()
+        {
+            //    if (Connector != null)
+            //    {
+            //        Connector.MessageReceived -= ListenerConnector_MessageReceived;
+            //        Connector.OfflineConnectivity -= ListenerConnector_OfflineConnectivity;
+            //        Connector.OnlineConnectivity -= ListenerConnector_OnlineConnectivity;
 
-        //        if (Connector.ChannelClient != null)
-        //        {
-        //            Connector.ChannelClient.ChannelConnected -= ChannelClient_ChannelConnected;
-        //            Connector.ChannelClient.ChannelDisconnected -= ChannelClient_ChannelDisconnected;
-        //            Connector.ChannelClient.ChannelReconnected -= ChannelClient_ChannelReconnected;
-        //        }
-        //    }
-        //}
+            //        if (Connector.ChannelClient != null)
+            //        {
+            //            Connector.ChannelClient.ChannelConnected -= ChannelClient_ChannelConnected;
+            //            Connector.ChannelClient.ChannelDisconnected -= ChannelClient_ChannelDisconnected;
+            //            Connector.ChannelClient.ChannelReconnected -= ChannelClient_ChannelReconnected;
+            //        }
+            //    }
+        }
 
-        //private void DisconnectFromListener()
-        //{
-        //    // TODO: Jon, please consider moving this timeout into your configuration file :).
-        //    Connector.Unsubscribe().Wait(5000);
-        //    Connector.Dispose();
-        //    Connector = null;
-        //}
+        private void DisconnectFromListener()
+        {
+            //    Connector.Unsubscribe().Wait(5000);
+            //    Connector.Dispose();
+            //    Connector = null;
+        }
 
         //private void ChannelClient_ChannelReconnected()
         //{
@@ -391,6 +393,9 @@ namespace DEVICE_CORE.StateMachine.State.Management
 
         //private void ListenerConnector_MessageReceived(Listener.Common.Packets.ListenerPacketHeader header, object message)
         //=> RaiseOnRequestReceived(message as string);
+
+        public void SendDeviceCommand(object message)
+            => RaiseOnRequestReceived(message as string);
 
         //internal void PublishEventHandler(LinkEventResponse.EventTypeType eventType, LinkEventResponse.EventCodeType eventCode,
         //    List<LinkDeviceResponse> devices, LinkRequest request, string message)
@@ -485,8 +490,8 @@ namespace DEVICE_CORE.StateMachine.State.Management
                 currentStateAction?.Dispose();
 
                 DestroyComportMonitoring();
-                //DestroyConnectorEvents();
-                //DisconnectFromListener();
+                DestroyConnectorEvents();
+                DisconnectFromListener();
 
                 ExecuteFinalState();
             }

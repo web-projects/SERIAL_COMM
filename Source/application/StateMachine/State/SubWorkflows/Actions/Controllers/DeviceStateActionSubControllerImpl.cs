@@ -1,11 +1,11 @@
-﻿using DEVICE_CORE.State.SubWorkflows.Management;
+﻿using DEVICE_CORE.StateMachine.State.SubWorkflows.Management;
 using DEVICE_CORE.StateMachine.State.Enums;
 using System;
 using System.Collections.Generic;
 
 using static DEVICE_CORE.StateMachine.State.Enums.DeviceSubWorkflowState;
 
-namespace DEVICE_CORE.State.SubWorkflows.Actions.Controllers
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Controllers
 {
     internal class DeviceStateActionSubControllerImpl : IDeviceSubStateActionController
     {
@@ -15,6 +15,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions.Controllers
             new Dictionary<DeviceSubWorkflowState, Func<IDeviceSubStateController, IDeviceSubStateAction>>(
                 new Dictionary<DeviceSubWorkflowState, Func<IDeviceSubStateController, IDeviceSubStateAction>>
                 {
+                    [GetStatus] = (IDeviceSubStateController _) => new DeviceGetStatusSubStateAction(_),
                     [AbortCommand] = (IDeviceSubStateController _) => new DeviceAbortCommandSubStateAction(_),
                     [ResetCommand] = (IDeviceSubStateController _) => new DeviceResetCommandSubStateAction(_),
                     [SanityCheck] = (IDeviceSubStateController _) => new DeviceSanityCheckSubStateAction(_),

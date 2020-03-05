@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using DEVICE_SDK.Sdk;
+using Devices.Common.Interfaces;
 
 namespace DEVICE_CORE.Tests.State.Management
 {
@@ -32,10 +34,10 @@ namespace DEVICE_CORE.Tests.State.Management
         //readonly Mock<IListenerConnector> mockListenerConnector;
         //readonly Mock<IListenerConnectorProvider> mockListenerConnectorProvider;
 
-        //readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
-        //readonly List<ICardDevice> cardDevices;
-        //readonly Mock<ICardDevice> fakeDeviceOne;
-        //readonly Mock<ICardDevice> fakeDeviceTwo;
+        readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
+        readonly List<ICardDevice> cardDevices;
+        readonly Mock<ICardDevice> fakeDeviceOne;
+        readonly Mock<ICardDevice> fakeDeviceTwo;
 
         const string someFakePath = @"C:\fakepluginpath";
 
@@ -72,19 +74,19 @@ namespace DEVICE_CORE.Tests.State.Management
             mockDeviceStateActionControllerProvider.Setup(e => e.GetStateActionController(subject)).Returns(mockDeviceStateActionController.Object);
 
             // Setup fake card devices list and also 2 fake devices for testing purposes.
-            //cardDevices = new List<ICardDevice>();
+            cardDevices = new List<ICardDevice>();
 
-            //fakeDeviceOne = new Mock<ICardDevice>();
-            //fakeDeviceTwo = new Mock<ICardDevice>();
+            fakeDeviceOne = new Mock<ICardDevice>();
+            fakeDeviceTwo = new Mock<ICardDevice>();
 
-            //cardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
+            cardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
 
-            //mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
-            //mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(someFakePath)).Returns(cardDevices);
+            mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
+            mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(someFakePath)).Returns(cardDevices);
 
             using IKernel kernel = new DeviceKernelResolver().ResolveKernel();
             //kernel.Rebind<IListenerConnectorProvider>().ToConstant(mockListenerConnectorProvider.Object);
-            //kernel.Rebind<IDevicePluginLoader>().ToConstant(mockDevicePluginLoader.Object);
+            kernel.Rebind<IDevicePluginLoader>().ToConstant(mockDevicePluginLoader.Object);
             kernel.Rebind<IDeviceConfigurationProvider>().ToConstant(mockConfigurationProvider.Object);
             //kernel.Rebind<ILoggingServiceClientProvider>().ToConstant(mockLoggingServiceClientProvider.Object);
             kernel.Rebind<IDeviceStateActionControllerProvider>().ToConstant(mockDeviceStateActionControllerProvider.Object);

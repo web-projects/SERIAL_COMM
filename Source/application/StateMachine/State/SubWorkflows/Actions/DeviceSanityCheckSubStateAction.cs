@@ -10,7 +10,7 @@ using XO.Device;
 using XO.Requests;
 using static DEVICE_CORE.StateMachine.State.Enums.DeviceSubWorkflowState;
 
-namespace DEVICE_CORE.State.SubWorkflows.Actions
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions
 {
     internal class DeviceSanityCheckSubStateAction : DeviceBaseSubStateAction
     {

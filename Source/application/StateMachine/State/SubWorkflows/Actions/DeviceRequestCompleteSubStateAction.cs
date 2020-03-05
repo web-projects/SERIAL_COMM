@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using XO.Requests;
 
-namespace DEVICE_CORE.State.SubWorkflows.Actions
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions
 {
     internal class DeviceRequestCompleteSubStateAction : DeviceBaseSubStateAction
     {
@@ -43,9 +43,9 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
             return Task.CompletedTask;
         }
 
-        //public override void RequestReceived(LinkRequest request)
-        //{
-        //    base.RequestReceived(request);
-        //}
+        public override void RequestReceived(LinkRequest request)
+        {
+            base.RequestReceived(request);
+        }
     }
 }

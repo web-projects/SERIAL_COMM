@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using DEVICE_CORE.StateMachine.State.SubWorkflows;
+using Devices.Common.Interfaces;
+using LinkRequestExtensions;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using XO.Device;
 using XO.Requests;
 
 namespace DEVICE_CORE.StateMachine.State.Actions
@@ -34,8 +37,8 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             try
             {
                 //_ = Controller.LoggingClient.LogInfoAsync($"Received from {linkRequest}");
-                //LinkRequest linkRequestResponse = null;
-                object linkRequestResponse = null;
+                Console.WriteLine($"Received from {linkRequest}");
+                LinkRequest linkRequestResponse = null;
                 bool deviceConnected = false;
 
                 // Setup workflow
@@ -44,58 +47,34 @@ namespace DEVICE_CORE.StateMachine.State.Actions
 
                 Controller.SaveState(workflowOptions);
 
-                // check for device connected
-                /*if (Controller.TargetDevice == null && Controller.TargetDevices == null)
+                // Payment: targeted device
+                if (linkRequest.Actions?[0]?.Action == LinkAction.Payment ||
+                    linkRequest.Actions?[0]?.Action == LinkAction.DALAction)
                 {
-                    WorkflowOptions workflowOptions = new WorkflowOptions();
-                    workflowOptions.StateObject = linkRequest;
-
-                    Controller.SaveState(workflowOptions);
-                }
-                else if (Controller.TargetDevice != null)
-                {
-                    deviceConnected = Controller.TargetDevice.IsConnected(linkRequest);
-                    if (deviceConnected)
+                    LinkDeviceIdentifier deviceIdentifier = linkRequest.GetDeviceIdentifier();
+                    ICardDevice cardDevice = FindTargetDevice(deviceIdentifier);
+                    if (cardDevice != null)
                     {
-                        WorkflowOptions workflowOptions = new WorkflowOptions();
-                        workflowOptions.StateObject = linkRequest;
-
-                        Controller.SaveState(workflowOptions);
+                        deviceConnected = cardDevice.IsConnected(linkRequest);
+                        if (deviceConnected)
+                        {
+                            workflowOptions.StateObject = linkRequest;
+                        }
                     }
                 }
                 else
                 {
-                    WorkflowOptions workflowOptions = new WorkflowOptions();
-
-                    // Payment: targeted device
-                    if (linkRequest.Actions?[0]?.Action == LinkAction.Payment ||
-                        linkRequest.Actions?[0]?.Action == LinkAction.DALAction)
+                    // Session: device discovery
+                    foreach (var device in Controller.TargetDevices)
                     {
-                        LinkDeviceIdentifier deviceIdentifier = linkRequest.GetDeviceIdentifier();
-                        ICardDevice cardDevice = FindTargetDevice(deviceIdentifier);
-                        if (cardDevice != null)
+                        deviceConnected = device.IsConnected(linkRequest);
+                        if (deviceConnected)
                         {
-                            deviceConnected = cardDevice.IsConnected(linkRequest);
-                            if (deviceConnected)
-                            {
-                                workflowOptions.StateObject = linkRequest;
-                            }
+                            workflowOptions.StateObject = linkRequest;
                         }
                     }
-                    else
-                    {
-                        // Session: device discovery
-                        foreach (var device in Controller.TargetDevices)
-                        {
-                            deviceConnected = device.IsConnected(linkRequest);
-                            if (deviceConnected)
-                            {
-                                workflowOptions.StateObject = linkRequest;
-                            }
-                        }
-                    }
-                    Controller.SaveState(workflowOptions);
-                }*/
+                }
+                Controller.SaveState(workflowOptions);
 
                 if (!deviceConnected)
                 {
@@ -103,12 +82,14 @@ namespace DEVICE_CORE.StateMachine.State.Actions
 
                     object response = JsonConvert.SerializeObject(linkRequestResponse);
                     //_ = Controller.LoggingClient.LogInfoAsync($"Sending to Listener");
+                    Console.WriteLine($"Sending to Listener");
                     //await Controller.Connector.Publish(response, new TopicOption[] { TopicOption.Servicer }).ConfigureAwait(false);
                 }
             }
             catch (Exception e)
             {
                 //_ = Controller.LoggingClient.LogErrorAsync($"{e.Message} {linkRequest}");
+                Console.WriteLine($"{e.Message} {linkRequest}");
                 //if (Controller.Connector != null)
                 //{
                 //    await Controller.Connector.Publish(RequestHelper.LinkRequestResponseError(null, ErrorCodes.DalError, e.Message), new TopicOption[] { TopicOption.Servicer }).ConfigureAwait(false);

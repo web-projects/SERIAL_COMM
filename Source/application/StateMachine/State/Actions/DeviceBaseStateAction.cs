@@ -1,9 +1,12 @@
-﻿using DEVICE_CORE.Helpers;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using Devices.Common;
 using Devices.Common.Helpers;
+using Devices.Common.Interfaces;
+using System;
 using System.Threading.Tasks;
+using XO.Device;
+using XO.Requests;
 
 namespace DEVICE_CORE.StateMachine.State.Actions
 {
@@ -28,7 +31,7 @@ namespace DEVICE_CORE.StateMachine.State.Actions
         {
             if (Controller != null)
             {
-                //Controller.RequestReceived -= RequestReceived;
+                Controller.RequestReceived -= RequestReceived;
                 Controller.DeviceEventReceived -= DeviceEventReceived;
                 Controller.ComPortEventReceived -= ComportEventReceived;
             }
@@ -46,9 +49,7 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             return Task.CompletedTask;
         }
 
-        //public virtual void RequestReceived(LinkRequest request)
-
-        public virtual void RequestReceived(object request)
+        public virtual void RequestReceived(LinkRequest request)
         {
 
         }
@@ -65,41 +66,36 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             // multiple devices
         }
 
-        //public ICardDevice FindTargetDevice(LinkDeviceIdentifier deviceIdentifier)
-        //{
-        //    if (Controller.TargetDevice != null)
-        //    {
-        //        return Controller.TargetDevice;
-        //    }
+        public ICardDevice FindTargetDevice(LinkDeviceIdentifier deviceIdentifier)
+        {
+            if (deviceIdentifier == null)
+            {
+                return null;
+            }
 
-        //    if (deviceIdentifier == null)
-        //    {
-        //        return null;
-        //    }
+            return FindMatchingDevice(deviceIdentifier);
+        }
 
-        //    return FindMatchingDevice(deviceIdentifier);
-        //}
+        private protected ICardDevice FindMatchingDevice(LinkDeviceIdentifier deviceIdentifier)
+        {
+            ICardDevice cardDevice = null;
 
-        //private protected ICardDevice FindMatchingDevice(LinkDeviceIdentifier deviceIdentifier)
-        //{
-        //    ICardDevice cardDevice = null;
+            foreach (var device in Controller.TargetDevices)
+            {
+                if (device.DeviceInformation != null)
+                {
+                    if (device.DeviceInformation.Manufacturer.Equals(deviceIdentifier.Manufacturer, StringComparison.CurrentCultureIgnoreCase) &&
+                        device.DeviceInformation.Model.Equals(deviceIdentifier.Model, StringComparison.CurrentCultureIgnoreCase) &&
+                        device.DeviceInformation.SerialNumber.Equals(deviceIdentifier.SerialNumber, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        cardDevice = device;
+                        break;
+                    }
+                }
+            }
 
-        //    foreach (var device in Controller.TargetDevices)
-        //    {
-        //        if (device.DeviceInformation != null)
-        //        {
-        //            if (device.DeviceInformation.Manufacturer.Equals(deviceIdentifier.Manufacturer, StringComparison.CurrentCultureIgnoreCase) &&
-        //                device.DeviceInformation.Model.Equals(deviceIdentifier.Model, StringComparison.CurrentCultureIgnoreCase) &&
-        //                device.DeviceInformation.SerialNumber.Equals(deviceIdentifier.SerialNumber, StringComparison.CurrentCultureIgnoreCase))
-        //            {
-        //                cardDevice = device;
-        //                break;
-        //            }
-        //        }
-        //    }
-
-        //    return cardDevice;
-        //}
+            return cardDevice;
+        }
 
         protected Task Complete(IDeviceStateAction state) => _ = Task.Run(() => Controller.Complete(state));
 

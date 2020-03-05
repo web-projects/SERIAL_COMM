@@ -1,5 +1,4 @@
 ﻿using DEVICE_CORE.Helpers;
-using DEVICE_CORE.StateMachine.State;
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.SubWorkflows.Helpers;
 using Devices.Common;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 using XO.Device;
 using XO.Requests;
 
-namespace DEVICE_CORE.State.SubWorkflows.Actions
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions
 {
     internal abstract class DeviceBaseSubStateAction : IDeviceSubStateAction
     {
@@ -136,5 +135,10 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
         protected Task Complete(IDeviceSubStateAction state) => _ = Task.Run(() => Controller.Complete(state));
 
         protected Task Error(IDeviceSubStateAction state) => _ = Task.Run(() => Controller.Error(state));
+
+        public virtual void RequestReceived(LinkRequest request)
+        {
+
+        }
     }
 }

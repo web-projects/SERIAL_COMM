@@ -1,8 +1,8 @@
-﻿using DEVICE_CORE.State.Interfaces;
-using DEVICE_CORE.State.SubWorkflows;
-using DEVICE_CORE.State.Visitors;
+﻿using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.State.SubWorkflows;
+using DEVICE_CORE.StateMachine.State.Visitors;
 
-namespace DEVICE_CORE.State.Providers
+namespace DEVICE_CORE.StateMachine.State.Providers
 {
     internal interface IControllerVisitorProvider
     {

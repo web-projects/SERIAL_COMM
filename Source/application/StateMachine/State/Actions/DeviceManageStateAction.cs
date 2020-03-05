@@ -1,6 +1,9 @@
 ﻿using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
+using Devices.Common.Helpers;
+using System;
 using System.Threading.Tasks;
+using XO.Requests;
 
 namespace DEVICE_CORE.StateMachine.State.Actions
 {
@@ -10,6 +13,8 @@ namespace DEVICE_CORE.StateMachine.State.Actions
 
         public DeviceManageStateAction(IDeviceStateController _) : base(_) { }
 
+        static private LinkDeviceActionType lastDeviceAction = LinkDeviceActionType.GetStatus;
+
         public override bool DoDeviceDiscovery()
         {
             LastException = new StateException("device recovery is needed");
@@ -17,13 +22,54 @@ namespace DEVICE_CORE.StateMachine.State.Actions
             return true;
         }
 
+        private async void PostRequest()
+        {
+            await Task.Delay(4096);
+
+            // DEVICE RESET COMMAND
+            LinkRequest linkRequest = new LinkRequest()
+            {
+                MessageID = RandomGenerator.BuildRandomString(12),
+                Actions = new System.Collections.Generic.List<LinkActionRequest>()
+                {
+                    new LinkActionRequest()
+                    {
+                        Action = LinkAction.DALAction,
+                        DeviceActionRequest = new LinkDeviceActionRequest()
+                        {
+                            DeviceAction = lastDeviceAction
+                        },
+                        DeviceRequest = new LinkDeviceRequest()
+                        {
+                            DeviceIdentifier = new XO.Device.LinkDeviceIdentifier()
+                            {
+                                Manufacturer = "Simulator",
+                                Model = "SimCity",
+                                SerialNumber = "CEEEDEADBEEF"
+                            }
+                        }
+                    }
+                }
+            };
+            Console.WriteLine("----------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"REQUEST: {lastDeviceAction}");
+            Controller.SendDeviceCommand(Newtonsoft.Json.JsonConvert.SerializeObject(linkRequest));
+            lastDeviceAction += 1;
+            if (lastDeviceAction >= LinkDeviceActionType.GetIdentifier)
+            {
+                lastDeviceAction = LinkDeviceActionType.GetStatus;
+            }
+        }
+
         public override Task DoWork()
         {
+            PostRequest();
+
             return Task.CompletedTask;
         }
 
-        //public override void RequestReceived(LinkRequest request)
-        public override void RequestReceived(object request)
+
+        public override void RequestReceived(LinkRequest request)
         {
             Controller.SaveState(request);
 

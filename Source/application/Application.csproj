@@ -27,11 +27,13 @@
   <ItemGroup>
     <Folder Include="SerialPort\Interfaces\" />
     <Folder Include="StateMachine\Cancellation\" />
+    <Folder Include="StateMachine\State\Actions\Preprocessing\" />
     <Folder Include="StateMachine\State\Visitors\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\common\XO.csproj" />
+    <ProjectReference Include="..\common\core\Core.Patterns\Core.Patterns.csproj" />
+    <ProjectReference Include="..\common\xo\XO.csproj" />
     <ProjectReference Include="..\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\devices\sdk\Devices.SDK.csproj" />
   </ItemGroup>
@@ -43,8 +45,8 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="%25WINDIR%25\System32\XCOPY /y /i /d &quot;$(SolutionDir)devices\Verifone\bin\$(ConfigurationName)\netstandard2.0\Devices.Verifone.dll&quot; &quot;$(TargetDir)DevicePlugins\&quot;" />
-    <Exec Command="%25WINDIR%25\System32\XCOPY /y /i /d &quot;$(SolutionDir)devices\Simulator\bin\$(ConfigurationName)\netstandard2.0\Devices.Simulator.dll&quot; &quot;$(TargetDir)DevicePlugins\&quot;" />
+    <Exec Command="%25WINDIR%25\System32\XCOPY /y /i /d &quot;$(SolutionDir)devices\Verifone\bin\$(ConfigurationName)\netcoreapp3.0\Devices.Verifone.dll&quot; &quot;$(TargetDir)DevicePlugins\&quot;" />
+    <Exec Command="%25WINDIR%25\System32\XCOPY /y /i /d &quot;$(SolutionDir)devices\Simulator\bin\$(ConfigurationName)\netcoreapp3.0\Devices.Simulator.dll&quot; &quot;$(TargetDir)DevicePlugins\&quot;" />
   </Target>
 
 </Project>

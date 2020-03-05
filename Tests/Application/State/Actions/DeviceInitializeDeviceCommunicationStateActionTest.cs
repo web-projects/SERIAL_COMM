@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Devices.Common.Interfaces;
+using DEVICE_SDK.Sdk;
+using Devices.Common.Helpers;
 
 namespace DEVICE_CORE.Tests.State.Actions
 {
@@ -14,10 +17,10 @@ namespace DEVICE_CORE.Tests.State.Actions
     {
         readonly DeviceInitializeDeviceCommunicationStateAction subject;
 
-        //readonly Mock<ICardDevice> mockCardDevice;
+        readonly Mock<ICardDevice> mockCardDevice;
         //readonly Mock<ILoggingServiceClient> mockLoggingClient;
         readonly Mock<IDeviceStateController> mockController;
-        //readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
+        readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
         
         readonly DeviceStateMachineAsyncManager asyncManager;
 
@@ -28,19 +31,19 @@ namespace DEVICE_CORE.Tests.State.Actions
         {
             deviceSection = new DeviceSection();
 
-            //mockCardDevice = new Mock<ICardDevice>();
-            //mockCardDevice.SetupGet(e => e.Name).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
-            //mockCardDevice.SetupGet(e => e.ManufacturerConfigID).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
+            mockCardDevice = new Mock<ICardDevice>();
+            mockCardDevice.SetupGet(e => e.Name).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
+            mockCardDevice.SetupGet(e => e.ManufacturerConfigID).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
 
             //mockLoggingClient = new Mock<ILoggingServiceClient>();
-            //mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
+            mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
 
             mockController = new Mock<IDeviceStateController>();
             //mockController.SetupGet(e => e.LoggingClient).Returns(mockLoggingClient.Object);
             //mockController.SetupGet(e => e.TargetDevice).Returns(mockCardDevice.Object);
-            //mockController.SetupGet(e => e.DevicePluginLoader).Returns(mockDevicePluginLoader.Object);
+            mockController.SetupGet(e => e.DevicePluginLoader).Returns(mockDevicePluginLoader.Object);
             mockController.SetupGet(e => e.Configuration).Returns(deviceSection);
-            //mockController.SetupGet(e => e.PluginPath).Returns(pluginPath);
+            mockController.SetupGet(e => e.PluginPath).Returns(pluginPath);
 
             subject = new DeviceInitializeDeviceCommunicationStateAction(mockController.Object);
 
@@ -60,7 +63,7 @@ namespace DEVICE_CORE.Tests.State.Actions
             //mockController.SetupGet(e => e.TargetDevice).Returns(It.IsAny<ICardDevice>);
             //mockCardDevice.Setup(e => e.Probe(It.IsAny<DeviceConfig>(), It.IsAny<DeviceInformation>(), out dalActive));
 
-            //List<ICardDevice> iCardDevices = new List<ICardDevice>();
+            List<ICardDevice> iCardDevices = new List<ICardDevice>();
             //var noDevice = new NoDevice.NoDevice();
             //noDevice.SortOrder = 1;
             //iCardDevices.Add(noDevice);

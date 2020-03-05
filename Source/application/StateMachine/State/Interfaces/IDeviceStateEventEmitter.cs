@@ -1,10 +1,10 @@
 ﻿using DEVICE_CORE.StateMachine.State.Enums;
 using Devices.Common;
+using XO.Requests;
 
-namespace DEVICE_CORE.State.Interfaces
+namespace DEVICE_CORE.StateMachine.State.Interfaces
 {
-    //public delegate void OnRequestReceived(LinkRequest request);
-    public delegate void OnRequestReceived(object request);
+    public delegate void OnRequestReceived(LinkRequest request);
     public delegate void OnWorkflowStopped(DeviceWorkflowStopReason reason);
     public delegate void OnStateChange(DeviceWorkflowState oldState, DeviceWorkflowState newState);
 

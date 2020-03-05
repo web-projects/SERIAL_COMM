@@ -38,8 +38,8 @@ namespace Devices.Common.Interfaces
         // ------------------------------------------------------------------------
         // Methods that are mapped for usage in their respective sub-workflows.
         // ------------------------------------------------------------------------
-        LinkRequest GetStatus(LinkRequest request);
-        LinkRequest AbortCommand(LinkRequest request);
-        LinkRequest ResetDevice(LinkRequest request);
+        LinkRequest GetStatus(LinkRequest linkRequest);
+        LinkRequest AbortCommand(LinkRequest linkRequest);
+        LinkRequest ResetDevice(LinkRequest linkRequest);
     }
 }

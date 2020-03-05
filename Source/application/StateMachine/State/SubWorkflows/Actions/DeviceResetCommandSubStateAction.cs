@@ -9,11 +9,11 @@ using XO.Device;
 using XO.Requests;
 using static DEVICE_CORE.StateMachine.State.Enums.DeviceSubWorkflowState;
 
-namespace DEVICE_CORE.State.SubWorkflows.Actions
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions
 {
     internal class DeviceResetCommandSubStateAction : DeviceBaseSubStateAction
     {
-        public override DeviceSubWorkflowState WorkflowStateType => AbortCommand;
+        public override DeviceSubWorkflowState WorkflowStateType => ResetCommand;
 
         public DeviceResetCommandSubStateAction(IDeviceSubStateController _) : base(_) { }
 
@@ -40,7 +40,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Actions
                 if (cardDevice != null)
                 {
                     var timeoutPolicy = await cancellationBroker.ExecuteWithTimeoutAsync<LinkRequest>(
-                    _ => cardDevice.AbortCommand(linkRequest),
+                    _ => cardDevice.ResetDevice(linkRequest),
                     DeviceConstants.CardCaptureTimeout,
                     this.CancellationToken);
 

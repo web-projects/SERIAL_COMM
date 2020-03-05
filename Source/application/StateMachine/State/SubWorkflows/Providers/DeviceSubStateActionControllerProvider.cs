@@ -1,8 +1,8 @@
-﻿using DEVICE_CORE.State.SubWorkflows.Actions.Controllers;
-using DEVICE_CORE.State.SubWorkflows.Management;
+﻿using DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Controllers;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Management;
 using System;
 
-namespace DEVICE_CORE.State.SubWorkflows.Providers
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Providers
 {
     internal class DeviceSubStateActionControllerProvider : IDeviceSubStateActionControllerProvider
     {

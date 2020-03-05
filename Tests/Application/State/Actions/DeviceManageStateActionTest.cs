@@ -4,6 +4,7 @@ using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using System;
 using Xunit;
+using XO.Requests;
 
 namespace DEVICE_CORE.Tests.State.Actions
 {
@@ -32,8 +33,7 @@ namespace DEVICE_CORE.Tests.State.Actions
         [Fact]
         public void RequestReceived_ShouldCallSaveState_When_Called()
         {
-            //LinkRequest linkRequest = new LinkRequest();
-            Object linkRequest = new object();
+            LinkRequest linkRequest = new LinkRequest();
             subject.RequestReceived(linkRequest);
 
             Assert.True(asyncManager.WaitFor());

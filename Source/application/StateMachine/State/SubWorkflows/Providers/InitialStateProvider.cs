@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using XO.Requests;
 
-namespace DEVICE_CORE.State.SubWorkflows.Providers
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Providers
 {
     internal class InitialStateProvider
     {
@@ -17,6 +17,7 @@ namespace DEVICE_CORE.State.SubWorkflows.Providers
             LinkActionRequest linkActionRequest = request.Actions.First();
             DeviceSubWorkflowState proposedState = ((linkActionRequest.DeviceActionRequest?.DeviceAction) switch
             {
+                LinkDeviceActionType.GetStatus => DeviceSubWorkflowState.GetStatus,
                 LinkDeviceActionType.AbortCommand => DeviceSubWorkflowState.AbortCommand,
                 LinkDeviceActionType.ResetCommand => DeviceSubWorkflowState.ResetCommand,
                 _ => DeviceSubWorkflowState.Undefined

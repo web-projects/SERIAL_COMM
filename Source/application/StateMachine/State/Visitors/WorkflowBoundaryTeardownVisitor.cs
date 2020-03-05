@@ -1,7 +1,7 @@
-﻿using DEVICE_CORE.State.Interfaces;
-using DEVICE_CORE.State.SubWorkflows;
+﻿using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.State.SubWorkflows;
 
-namespace DEVICE_CORE.State.Visitors
+namespace DEVICE_CORE.StateMachine.State.Visitors
 {
     internal class WorkflowBoundaryTeardownVisitor : IStateControllerVisitor<ISubWorkflowHook, IDeviceSubStateController>
     {

@@ -1,5 +1,5 @@
 ﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.State.SubWorkflows.Actions;
+using DEVICE_CORE.StateMachine.State.SubWorkflows.Actions;
 using DEVICE_CORE.StateMachine.Cancellation;
 using DEVICE_CORE.StateMachine.State;
 using Devices.Common.Helpers;
@@ -7,7 +7,7 @@ using Devices.Common.Interfaces;
 using System.Collections.Generic;
 using XO.Requests;
 
-namespace DEVICE_CORE.State.SubWorkflows
+namespace DEVICE_CORE.StateMachine.State.SubWorkflows
 {
     internal interface IDeviceSubStateController : IStateControlTrigger<IDeviceSubStateAction>
     {

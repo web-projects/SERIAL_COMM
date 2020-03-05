@@ -1,6 +1,6 @@
-﻿using DEVICE_CORE.State.Interfaces;
+﻿using DEVICE_CORE.StateMachine.State.Interfaces;
 
-namespace DEVICE_CORE.State.Visitors
+namespace DEVICE_CORE.StateMachine.State.Visitors
 {
     internal interface IStateControllerVisitor<TVisitableController, TVisitorAcceptor> where TVisitableController : ISubWorkflowHook
     {

@@ -1,4 +1,4 @@
-﻿namespace DEVICE_CORE.State.SubWorkflows
+﻿namespace DEVICE_CORE.StateMachine.State.SubWorkflows
 {
     internal class SubStateActionLaunchRules
     {

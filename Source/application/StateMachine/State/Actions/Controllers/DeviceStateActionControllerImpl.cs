@@ -20,7 +20,7 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Controllers
                     [DeviceWorkflowState.InitializeDeviceHealth] = (IDeviceStateController _) => new DeviceInitializeDeviceHealthStateAction(_),
                     [DeviceWorkflowState.Manage] = (IDeviceStateController _) => new DeviceManageStateAction(_),
                     [DeviceWorkflowState.ProcessRequest] = (IDeviceStateController _) => new DeviceProcessRequestStateAction(_),
-                    //[DeviceWorkflowState.SubWorkflowIdleState] = (IDeviceStateController _) => new DeviceSubWorkflowIdleStateAction(_),
+                    [DeviceWorkflowState.SubWorkflowIdleState] = (IDeviceStateController _) => new DeviceSubWorkflowIdleStateAction(_),
                     [DeviceWorkflowState.Shutdown] = (IDeviceStateController _) => new DeviceShutdownStateAction(_)
                 }
         );

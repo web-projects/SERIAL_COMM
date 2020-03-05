@@ -210,7 +210,7 @@ namespace Devices.Verifone.Connection
                 }
                 catch (TimeoutException te)
                 {
-                    //Console.WriteLine($"SERIAL: ON PORT={commPort} - exception={te.Message}");
+                    Console.WriteLine($"SERIAL: ON PORT={commPort} - exception={te.Message}");
                 }
                 catch (OperationCanceledException op)
                 {

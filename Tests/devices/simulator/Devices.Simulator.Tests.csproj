@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\common\xo\XO.csproj" />
     <ProjectReference Include="..\..\..\Source\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\..\..\Source\devices\Simulator\SimulatorDevice.csproj" />
   </ItemGroup>
