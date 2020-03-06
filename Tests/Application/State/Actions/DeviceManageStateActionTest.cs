@@ -1,12 +1,12 @@
-﻿using Moq;
-using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.Tests;
+using Moq;
 using System;
-using Xunit;
 using XO.Requests;
+using Xunit;
 
-namespace DEVICE_CORE.Tests.State.Actions
+namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 {
     public class DeviceManageStateActionTest : IDisposable
     {

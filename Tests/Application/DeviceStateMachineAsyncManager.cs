@@ -3,7 +3,7 @@ using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using System.Threading;
 
-namespace DEVICE_CORE.Tests
+namespace DEVICE_CORE.StateMachine.Tests
 {
     class DeviceStateMachineAsyncManager
     {

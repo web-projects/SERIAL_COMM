@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace DEVICE_CORE.Tests.Helpers
+namespace DEVICE_CORE.Helpers.Tests
 {
     public static class RandomGenerator
     {

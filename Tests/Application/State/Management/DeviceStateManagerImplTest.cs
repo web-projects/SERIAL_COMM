@@ -1,20 +1,19 @@
-﻿using Moq;
-using Ninject;
-using DEVICE_CORE.Config;
+﻿using DEVICE_CORE.Config;
 using DEVICE_CORE.Modules;
 using DEVICE_CORE.StateMachine.State.Actions;
 using DEVICE_CORE.StateMachine.State.Actions.Controllers;
 using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Management;
 using DEVICE_CORE.StateMachine.State.Providers;
+using DEVICE_SDK.Sdk;
+using Devices.Common.Interfaces;
+using Moq;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
-using DEVICE_SDK.Sdk;
-using Devices.Common.Interfaces;
 
-namespace DEVICE_CORE.Tests.State.Management
+namespace DEVICE_CORE.StateMachine.State.Management.Tests
 {
     public class DeviceStateManagerImplTest
     {

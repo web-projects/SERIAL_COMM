@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace DEVICE_CORE.Tests.Helpers
+﻿namespace DEVICE_CORE.Helpers.Tests
 {
     //public class ConnectorListenerHelper : IListenerConnector
     public class ConnectorListenerHelper

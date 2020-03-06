@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace DEVICE_CORE.Tests.State.TestStubs
+namespace DEVICE_CORE.StateMachine.State.TestStubs.Tests
 {
     //internal class StubDeviceSubStateManager : IDeviceSubStateManager, IDeviceSubStateController
     internal class StubDeviceSubStateManager
     {
         //public DeviceSection Configuration => throw new NotImplementedException();
 
-       // public ILoggingServiceClient LoggingClient => throw new NotImplementedException();
+        // public ILoggingServiceClient LoggingClient => throw new NotImplementedException();
 
         //public IListenerConnector Connector => throw new NotImplementedException();
 

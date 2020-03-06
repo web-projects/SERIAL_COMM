@@ -4,8 +4,9 @@ using DEVICE_CORE.Modules;
 using DEVICE_CORE.StateMachine.State.Management;
 using System;
 using Xunit;
+using DEVICE_CORE.StateMachine.Tests;
 
-namespace DEVICE_CORE.Tests
+namespace DEVICE_CORE.Application.Tests
 {
     public class DeviceApplicationTest : IDisposable
     {

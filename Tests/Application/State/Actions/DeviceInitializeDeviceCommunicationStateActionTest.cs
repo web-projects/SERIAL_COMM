@@ -1,27 +1,36 @@
-﻿using Moq;
-using DEVICE_CORE.Config;
-using DEVICE_CORE.StateMachine.State.Actions;
+﻿using DEVICE_CORE.Config;
 using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
+using DEVICE_CORE.StateMachine.Tests;
+using DEVICE_SDK.Sdk;
+using Devices.Common;
+using Devices.Common.Helpers;
+using Devices.Common.Interfaces;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XO.Device;
+using XO.Requests;
 using Xunit;
-using Devices.Common.Interfaces;
-using DEVICE_SDK.Sdk;
-using Devices.Common.Helpers;
 
-namespace DEVICE_CORE.Tests.State.Actions
+namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 {
     public class DeviceInitializeDeviceCommunicationStateActionTest : IDisposable
     {
         readonly DeviceInitializeDeviceCommunicationStateAction subject;
 
-        readonly Mock<ICardDevice> mockCardDevice;
+        readonly LinkRequest linkRequest;
+
+        List<ICardDevice> cardDevices = new List<ICardDevice>();
+        readonly Mock<ICardDevice> fakeDeviceOne = new Mock<ICardDevice>();
+        readonly Mock<ICardDevice> fakeDeviceTwo = new Mock<ICardDevice>();
+        readonly DeviceInformation deviceInformation;
+
         //readonly Mock<ILoggingServiceClient> mockLoggingClient;
         readonly Mock<IDeviceStateController> mockController;
         readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
-        
+
         readonly DeviceStateMachineAsyncManager asyncManager;
 
         readonly string pluginPath = "some_plugin_path";
@@ -29,21 +38,51 @@ namespace DEVICE_CORE.Tests.State.Actions
 
         public DeviceInitializeDeviceCommunicationStateActionTest()
         {
-            deviceSection = new DeviceSection();
+            linkRequest = new LinkRequest()
+            {
+                //LinkObjects = new LinkRequestIPA5Object
+                //{
+                //    LinkActionResponseList = new List<XO.Responses.LinkActionResponse>()
+                //},
+                Actions = new List<LinkActionRequest>()
+                {
+                    new LinkActionRequest()
+                    {
+                        MessageID = RandomGenerator.BuildRandomString(8),
+                        Timeout = 10000,
+                        DeviceRequest = new LinkDeviceRequest()
+                        {
+                            DeviceIdentifier = new LinkDeviceIdentifier()
+                            {
+                                Manufacturer = "DeviceMockerInc",
+                                Model = "DeviceMokerModel",
+                                SerialNumber = "CEEEDEADBEEF"
+                            }
+                        }
+                    }
+                }
+            };
 
-            mockCardDevice = new Mock<ICardDevice>();
-            mockCardDevice.SetupGet(e => e.Name).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
-            mockCardDevice.SetupGet(e => e.ManufacturerConfigID).Returns(StringValueAttribute.GetStringValue(DeviceType.NoDevice));
+            deviceSection = new DeviceSection();
 
             //mockLoggingClient = new Mock<ILoggingServiceClient>();
             mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
 
             mockController = new Mock<IDeviceStateController>();
             //mockController.SetupGet(e => e.LoggingClient).Returns(mockLoggingClient.Object);
-            //mockController.SetupGet(e => e.TargetDevice).Returns(mockCardDevice.Object);
             mockController.SetupGet(e => e.DevicePluginLoader).Returns(mockDevicePluginLoader.Object);
             mockController.SetupGet(e => e.Configuration).Returns(deviceSection);
             mockController.SetupGet(e => e.PluginPath).Returns(pluginPath);
+
+            deviceInformation = new DeviceInformation()
+            {
+                Manufacturer = linkRequest.Actions[0].DeviceRequest.DeviceIdentifier.Manufacturer,
+                Model = linkRequest.Actions[0].DeviceRequest.DeviceIdentifier.Model,
+                SerialNumber = linkRequest.Actions[0].DeviceRequest.DeviceIdentifier.SerialNumber,
+            };
+            fakeDeviceOne.Setup(e => e.DeviceInformation).Returns(deviceInformation);
+            cardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
+            mockController.SetupGet(e => e.TargetDevices).Returns(cardDevices);
 
             subject = new DeviceInitializeDeviceCommunicationStateAction(mockController.Object);
 
@@ -97,16 +136,16 @@ namespace DEVICE_CORE.Tests.State.Actions
             bool dalActive = true;
             //mockCardDevice.Setup(e => e.Probe(It.IsAny<DeviceConfig>(), It.IsAny<DeviceInformation>(), out dalActive));
 
-            //List<ICardDevice> iCardDevices = new List<ICardDevice>()
-            //{
-            //    new NoDevice.NoDevice()
-            //};
-            //mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(pluginPath)).Returns(iCardDevices);
+            List<ICardDevice> iCardDevices = new List<ICardDevice>()
+            {
+                new Devices.Simulator.DeviceSimulator()
+            };
+            mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(pluginPath)).Returns(iCardDevices);
 
             Assert.Equal(subject.DoWork(), Task.CompletedTask);
             Assert.True(asyncManager.WaitFor());
 
-            //mockDevicePluginLoader.Verify(e => e.FindAvailableDevices(pluginPath), Times.Once());
+            mockDevicePluginLoader.Verify(e => e.FindAvailableDevices(pluginPath), Times.Once());
 
             //mockController.Verify(e => e.SetTargetDevice(It.IsAny<ICardDevice>()), Times.Once());
             //mockController.Verify(e => e.SetTargetDevice(It.IsAny<NoDevice.NoDevice>()), Times.Once());

@@ -4,8 +4,9 @@ using DEVICE_CORE.StateMachine.State.Enums;
 using DEVICE_CORE.StateMachine.State.Interfaces;
 using System;
 using Xunit;
+using DEVICE_CORE.StateMachine.Tests;
 
-namespace DEVICE_CORE.Tests.State.Actions
+namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 {
     public class DeviceShutdownStateActionTest : IDisposable
     {

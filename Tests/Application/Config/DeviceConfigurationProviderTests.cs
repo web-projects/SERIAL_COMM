@@ -1,7 +1,6 @@
-﻿using DEVICE_CORE.Config;
-using Xunit;
+﻿using Xunit;
 
-namespace DEVICE_CORE.Tests.Config
+namespace DEVICE_CORE.Config.Tests
 {
     public class DeviceConfigurationProviderTests
     {

@@ -1,10 +1,9 @@
-﻿using DEVICE_CORE.StateMachine.Cancellation;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.Cancellation
+namespace DEVICE_CORE.StateMachine.Cancellation.Tests
 {
     public class DeviceCancellationBrokerImplTests
     {

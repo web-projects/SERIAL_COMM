@@ -1,8 +1,7 @@
-﻿using DEVICE_CORE.Providers;
-using System;
+﻿using System;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.Providers
+namespace DEVICE_CORE.Providers.Tests
 {
     public class DeviceApplicationProviderTest
     {

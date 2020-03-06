@@ -5,6 +5,10 @@ namespace XO.Requests
 {
     public class LinkActionRequest
     {
+        public string MessageID { get; set; }
+
+        public int Timeout { get; set; }
+
         public LinkAction? Action { get; set; }
         
         public LinkDeviceRequest DeviceRequest { get; set; }

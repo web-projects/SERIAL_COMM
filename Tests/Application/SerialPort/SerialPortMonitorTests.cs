@@ -1,11 +1,10 @@
-﻿using DEVICE_CORE.SerialPort;
-using DEVICE_CORE.SerialPort.Interfaces;
+﻿using DEVICE_CORE.SerialPort.Interfaces;
 using System;
 using System.Management;
 using TestHelper;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.SerialPort
+namespace DEVICE_CORE.SerialPort.Tests
 {
     public class SerialPortMonitorTests : IDisposable
     {

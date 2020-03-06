@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DEVICE_CORE.Tests.Helpers
+namespace DEVICE_CORE.Helpers.Tests
 {
     internal static class RequestBuilder
     {

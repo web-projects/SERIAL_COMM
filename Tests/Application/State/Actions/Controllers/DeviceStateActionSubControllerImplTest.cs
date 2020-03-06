@@ -1,10 +1,4 @@
-﻿using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Enums;
-using System;
-using System.Collections.Generic;
-using Xunit;
-
-namespace DEVICE_CORE.Tests.State.Actions.Controllers
+﻿namespace DEVICE_CORE.StateMachine.State.Actions.Controllers.Tests
 {
     public class DeviceStateActionSubControllerImplTest
     {

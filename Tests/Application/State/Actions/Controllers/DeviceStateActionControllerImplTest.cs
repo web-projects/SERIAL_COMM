@@ -1,14 +1,9 @@
-﻿using DEVICE_CORE.StateMachine.State;
-using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Actions.Controllers;
-using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Interfaces;
-using DEVICE_CORE.Tests.State.TestStubs;
+﻿using DEVICE_CORE.StateMachine.State.Enums;
+using DEVICE_CORE.StateMachine.State.TestStubs.Tests;
 using System;
-using System.Collections.ObjectModel;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.State.Actions.Controllers
+namespace DEVICE_CORE.StateMachine.State.Actions.Controllers.Tests
 {
     public class DeviceStateActionControllerImplTest
     {
@@ -30,12 +25,12 @@ namespace DEVICE_CORE.Tests.State.Actions.Controllers
         [InlineData(typeof(DeviceRecoveryStateAction), DeviceWorkflowState.SubWorkflowIdleState, true, true)]
         public void GetNextAction_ShouldReturnCorrectType_When_Called(Type expectedType, DeviceWorkflowState initialState, bool set = true, bool exception = false)
         {
-           TestHelper.Helper.SetFieldValueToInstance<IDeviceStateAction>("currentStateAction", false, false, subject, null);
+            TestHelper.Helper.SetFieldValueToInstance<IDeviceStateAction>("currentStateAction", false, false, subject, null);
 
             //if (set)
             //{
-                //var map = TestHelper.Helper.GetFieldValueFromInstance<ReadOnlyDictionary<DeviceWorkflowState, Func<IDeviceStateController, IDeviceStateAction>>>(
-                //    "workflowMap", false, false, subject);
+            //var map = TestHelper.Helper.GetFieldValueFromInstance<ReadOnlyDictionary<DeviceWorkflowState, Func<IDeviceStateController, IDeviceStateAction>>>(
+            //    "workflowMap", false, false, subject);
 
             //    IDeviceStateAction action = map[initialState](stubManager);
 

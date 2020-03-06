@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DEVICE_CORE.Tests.State.TestStubs
+namespace DEVICE_CORE.StateMachine.State.TestStubs.Tests
 {
     //internal class StubGenericDeviceSubStateManager : IDeviceSubStateManager, IDeviceSubStateController, IStateControllerVisitable<ISubWorkflowHook, IDeviceSubStateController>
     internal class StubGenericDeviceSubStateManager

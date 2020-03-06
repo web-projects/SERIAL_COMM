@@ -1,11 +1,11 @@
-﻿using Moq;
-using Ninject;
-using DEVICE_CORE.Modules;
+﻿using DEVICE_CORE.Modules;
 using DEVICE_CORE.Providers;
+using Moq;
+using Ninject;
 using System;
 using Xunit;
 
-namespace DEVICE_CORE.Tests
+namespace DEVICE_CORE.Activator.Tests
 {
     public class DeviceActivatorTest
     {

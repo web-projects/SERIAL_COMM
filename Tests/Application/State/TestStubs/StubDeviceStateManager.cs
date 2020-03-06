@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DEVICE_CORE.Tests.State.TestStubs
+namespace DEVICE_CORE.StateMachine.State.TestStubs.Tests
 {
     internal class StubDeviceStateManager : IDeviceStateManager, IDeviceStateController
     {

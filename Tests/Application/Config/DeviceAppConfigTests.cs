@@ -1,5 +1,4 @@
-﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.Tests.Helpers;
+﻿using DEVICE_CORE.Helpers.Tests;
 using System;
 using Xunit;
 

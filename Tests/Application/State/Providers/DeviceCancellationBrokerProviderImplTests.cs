@@ -2,7 +2,7 @@
 using DEVICE_CORE.StateMachine.Cancellation;
 using Xunit;
 
-namespace DEVICE_CORE.Tests.State.Providers
+namespace DEVICE_CORE.StateMachine.State.Providers.Tests
 {
     public class DeviceCancellationBrokerProviderImplTests
     {
