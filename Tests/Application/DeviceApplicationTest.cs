@@ -1,10 +1,9 @@
-﻿using Moq;
+﻿using DEVICE_CORE.Modules;
+using Moq;
 using Ninject;
-using DEVICE_CORE.Modules;
-using DEVICE_CORE.StateMachine.State.Management;
+using StateMachine.State.Management;
 using System;
 using Xunit;
-using DEVICE_CORE.StateMachine.Tests;
 
 namespace DEVICE_CORE.Application.Tests
 {

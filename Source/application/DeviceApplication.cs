@@ -1,5 +1,5 @@
 ﻿using Ninject;
-using DEVICE_CORE.StateMachine.State.Management;
+using StateMachine.State.Management;
 using System.Threading.Tasks;
 
 namespace DEVICE_CORE

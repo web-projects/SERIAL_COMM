@@ -7,8 +7,11 @@
 
   <ItemGroup>
     <Compile Remove="Common\**" />
+    <Compile Remove="SerialPort\**" />
     <EmbeddedResource Remove="Common\**" />
+    <EmbeddedResource Remove="SerialPort\**" />
     <None Remove="Common\**" />
+    <None Remove="SerialPort\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,17 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SerialPort\Interfaces\" />
-    <Folder Include="StateMachine\Cancellation\" />
-    <Folder Include="StateMachine\State\Actions\Preprocessing\" />
-    <Folder Include="StateMachine\State\Visitors\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\common\core\Core.Patterns\Core.Patterns.csproj" />
     <ProjectReference Include="..\common\xo\XO.csproj" />
+    <ProjectReference Include="..\config\Config.csproj" />
     <ProjectReference Include="..\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\devices\sdk\Devices.SDK.csproj" />
+    <ProjectReference Include="..\statemachine\StateMachine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

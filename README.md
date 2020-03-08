@@ -44,3 +44,4 @@ This an applicationto test Serial Communication.
 * 20200304 - Added subworkflows.
 * 20200305 - Device Integration.
 * 20200305 - Fixes to device recovery.
+* 20200307 - Refactored state machine.
