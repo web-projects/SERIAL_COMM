@@ -22,7 +22,7 @@ namespace Devices.Simulator
         public int SortOrder { get; set; } = -1;
 
         [Inject]
-        private ISerialConnection serialConnection { get; set;  }
+        private ISerialConnection serialConnection { get; set; } = new SerialConnection();
 
         private bool IsConnected { get; set; }
 
@@ -101,8 +101,7 @@ namespace Devices.Simulator
                 VendorIdentifier = "BADDCACA"
             };
             deviceInfo = DeviceInformation;
-            serialConnection = new SerialConnection(config.SerialConfig.CommPortName);
-            active = IsConnected = serialConnection.Connect();
+            active = IsConnected = serialConnection.Connect(config.SerialConfig.CommPortName);
         }
 
         public void DeviceSetIdle()

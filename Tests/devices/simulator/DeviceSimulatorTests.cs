@@ -11,35 +11,21 @@ namespace Devices.Simulator.Tests
     {
         readonly DeviceSimulator subject;
 
+        readonly DeviceInformation deviceInformation;
+        readonly SerialDeviceConfig serialConfig;
+
         Mock<ISerialConnection> moqSerialConnection;
 
         public DeviceSimulatorTests()
         {
-            subject = new DeviceSimulator();
-
             moqSerialConnection = new Mock<ISerialConnection>();
 
-            using (IKernel kernel = new StandardKernel())
-            {
-                kernel.Rebind<ISerialConnection>().ToConstant(moqSerialConnection.Object);
-                kernel.Inject(subject);
-            }
-        }
-
-        [Fact]
-        public void Probe_ReturnsActiveTrue_WhenCalled()
-        {
-            DeviceConfig deviceConfig = new DeviceConfig()
-            {
-                Valid = true
-            };
-            SerialDeviceConfig serialConfig = new SerialDeviceConfig
+            serialConfig = new SerialDeviceConfig
             {
                 CommPortName = "COM9"
             };
-            deviceConfig.SetSerialDeviceConfig(serialConfig);
 
-            DeviceInformation deviceInformation = new DeviceInformation()
+            deviceInformation = new DeviceInformation()
             {
                 ComPort = "COM9",
                 Manufacturer = "Simulator",
@@ -49,17 +35,42 @@ namespace Devices.Simulator.Tests
                 VendorIdentifier = "BADDCACA"
             };
 
-            moqSerialConnection.Setup(e => e.Connect(false)).Returns(true);
+            subject = new DeviceSimulator();
 
-            subject.Probe(deviceConfig, deviceInformation, out bool active);
-            Assert.True(active);
+            using (IKernel kernel = new StandardKernel())
+            {
+                kernel.Settings.InjectNonPublic = true;
+                kernel.Settings.InjectParentPrivateProperties = true;
+
+                kernel.Bind<ISerialConnection>().ToConstant(moqSerialConnection.Object).WithConstructorArgument(deviceInformation);
+                kernel.Inject(subject);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Probe_ReturnsProperActiveState_WhenCalled(bool expectedValue)
+        {
+            moqSerialConnection.Setup(e => e.Connect(It.IsAny<string>(), false)).Returns(expectedValue);
+
+            DeviceConfig deviceConfig = new DeviceConfig()
+            {
+                Valid = true
+            };
+           
+            deviceConfig.SetSerialDeviceConfig(serialConfig);
+
+            subject.Probe(deviceConfig, deviceInformation, out bool actualValue);
+            Assert.Equal(expectedValue, actualValue);
         }
 
         [Fact]
-        public void GetStatus_ThrowsNotImplemented_WhenCalled()
+        public void GetStatus_ReturnsExpectedValue_WhenCalled()
         {
-            LinkRequest objRequest = new LinkRequest();
-            Assert.Throws<System.NotImplementedException>(() => subject.GetStatus(objRequest));
+            LinkRequest expectedValue = new LinkRequest();
+            LinkRequest actualValue = subject.GetStatus(expectedValue);
+            Assert.Equal(expectedValue, actualValue);
         }
     }
 }

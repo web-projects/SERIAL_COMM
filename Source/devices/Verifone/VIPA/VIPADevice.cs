@@ -43,10 +43,10 @@ namespace Devices.Verifone.VIPA
         #region --- connection ---
         private SerialConnection serialConnection { get; set; }
 
-        public bool Connect(SerialConnection connection)
+        public bool Connect(string comPort, SerialConnection connection)
         {
             serialConnection = connection;
-            return serialConnection.Connect();
+            return serialConnection.Connect(comPort);
         }
 
         public void Dispose()

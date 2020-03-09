@@ -24,12 +24,12 @@ namespace Devices.Verifone
         //public event PublishEvent PublishEvent;
         public event DeviceEventHandler DeviceEventOccured;
 
-        private SerialConnection serialConnection { get; set; }
+        private SerialConnection serialConnection { get; set; } = new SerialConnection();
 
         private bool IsConnected { get; set; }
 
         [Inject]
-        internal IVIPADevice vipaDevice { get; set; }
+        internal IVIPADevice vipaDevice { get; set; } = new VIPADevice();
 
         public DeviceInformation DeviceInformation { get; private set; }
 
@@ -64,10 +64,7 @@ namespace Devices.Verifone
             DeviceInformation.Manufacturer = ManufacturerConfigID;
             DeviceInformation.ComPort = deviceInfo.ComPort;
 
-            serialConnection = new SerialConnection(deviceInfo.ComPort);
-
-            vipaDevice = new VIPADevice();
-            active = IsConnected = vipaDevice.Connect(serialConnection);
+            active = IsConnected = vipaDevice.Connect(deviceInfo.ComPort, serialConnection);
         }
 
         public List<DeviceInformation> DiscoverDevices()

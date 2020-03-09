@@ -4,7 +4,7 @@ namespace Devices.Verifone.Connection
 {
     internal interface ISerialConnection
     {
-        bool Connect(bool exposeExceptions = false);
+        bool Connect(string port, bool exposeExceptions = false);
         bool Connected();
         void Disconnect(bool exposeExceptions = false);
         void Dispose();

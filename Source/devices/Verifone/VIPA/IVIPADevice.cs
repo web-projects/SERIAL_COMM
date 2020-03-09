@@ -7,7 +7,7 @@ namespace Devices.Verifone.VIPA
 {
     public interface IVIPADevice
     {
-        bool Connect(SerialConnection connection);
+        bool Connect(string comPort, SerialConnection connection);
         void Dispose();
         (DeviceInfoObject deviceInfoObject, int VipaResponse) DeviceCommandReset();
         void ResponseCodeHandler(List<TLV.TLV> tags, int responseCode, bool cancelled = false);

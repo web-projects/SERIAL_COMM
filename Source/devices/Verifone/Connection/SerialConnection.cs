@@ -239,13 +239,9 @@ namespace Devices.Verifone.Connection
 
         #region --- public methods ---
 
-        public SerialConnection(string port)
+        public bool Connect(string port, bool exposeExceptions = false)
         {
             commPort = port;
-        }
-
-        public bool Connect(bool exposeExceptions = false)
-        {
             connected = false;
 
             try

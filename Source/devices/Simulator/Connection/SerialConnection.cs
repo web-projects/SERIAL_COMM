@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Devices.Simulator.Connection
 {
-    public class SerialConnection : IDisposable, ISerialConnection
+    public class SerialConnection : ISerialConnection, IDisposable
     {
         #region --- attributes ---
         private enum ReadErrorLevel
@@ -89,13 +89,9 @@ namespace Devices.Simulator.Connection
 
         #region --- public methods ---
 
-        public SerialConnection(string port)
+        public bool Connect(string port, bool exposeExceptions = false)
         {
             commPort = port;
-        }
-
-        public bool Connect(bool exposeExceptions = false)
-        {
             connected = false;
 
             try
