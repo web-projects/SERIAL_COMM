@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DEVICE_CORE
@@ -9,9 +8,6 @@ namespace DEVICE_CORE
     class Program
     {
         static readonly DeviceActivator activator = new DeviceActivator();
-
-        const int WRITE_COMMAND_TIMEOUT = 3;
-        static public CancellationToken CancellationToken { get; private set; }
 
         static async Task Main(string[] args)
         {
