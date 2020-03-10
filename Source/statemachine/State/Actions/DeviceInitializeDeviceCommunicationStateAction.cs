@@ -7,6 +7,10 @@ using Devices.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
+using XO.Responses;
+using StateMachine.Cancellation;
+using Devices.Common.Constants;
 
 namespace StateMachine.State.Actions
 {
@@ -91,13 +95,32 @@ namespace StateMachine.State.Actions
                             ICardDevice device = discoveredCardDevices[i].Clone() as ICardDevice;
 
                             device.DeviceEventOccured += Controller.DeviceEventReceived;
-                            device.Probe(deviceConfig, deviceInfo, out success);
+ 
+                            // Device powered on status capturing: free up the com port and try again.
+                            // This occurs when a USB device repowers the USB interface and the virtual port is open.
+                            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                            IDeviceCancellationBroker cancellationBroker = Controller.GetCancellationBroker();
+                            var timeoutPolicy = cancellationBroker.ExecuteWithTimeoutAsync<List<LinkErrorValue>>(
+                                _ => device.Probe(deviceConfig, deviceInfo, out success),
+                                Timeouts.DALGetStatusTimeout,
+                                CancellationToken.None);
 
-                            if (success)
+                            if (timeoutPolicy.Result.Outcome == Polly.OutcomeType.Failure)
                             {
-                                device.SortOrder = discoveredCardDevices[i].SortOrder;
-                                validatedCardDevices.Add(device);
+                                Console.WriteLine($"Unable to obtain device status for - '{device.Name}'.");
+                                validatedCardDevices[i].DeviceEventOccured -= Controller.DeviceEventReceived;
+                                device?.Dispose();
+                                LastException = new StateException("Unable to find a valid device to connect to.");
+                                _ = Error(this);
+                                _ = Complete(this);
+                                return Task.CompletedTask;
                             }
+                            else if (success)
+                            {
+                                discoveredCardDevices.Add(device);
+                            }
+
+
                         }
                     }
                     catch(Exception e)

@@ -1,8 +1,8 @@
-﻿using DEVICE_CORE.StateMachine.State.Enums;
+﻿using StateMachine.State.Enums;
 using System;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.Tests
+namespace StateMachine.State.Tests
 {
     public class DeviceStateTransitionHelperTest
     {
@@ -17,10 +17,10 @@ namespace DEVICE_CORE.StateMachine.State.Tests
         [InlineData(DeviceWorkflowState.InitializeDeviceHealth, DeviceWorkflowState.DeviceRecovery, true)]
         [InlineData(DeviceWorkflowState.Manage, DeviceWorkflowState.ProcessRequest)]
         [InlineData(DeviceWorkflowState.Manage, DeviceWorkflowState.DeviceRecovery, true)]
-        //[InlineData(DeviceWorkflowState.ProcessRequest, DeviceWorkflowState.SubWorkflowIdleState)]
-        //[InlineData(DeviceWorkflowState.ProcessRequest, DeviceWorkflowState.SubWorkflowIdleState, true)]
-        //[InlineData(DeviceWorkflowState.SubWorkflowIdleState, DeviceWorkflowState.Manage)]
-        //[InlineData(DeviceWorkflowState.SubWorkflowIdleState, DeviceWorkflowState.DeviceRecovery, true)]
+        [InlineData(DeviceWorkflowState.ProcessRequest, DeviceWorkflowState.SubWorkflowIdleState)]
+        [InlineData(DeviceWorkflowState.ProcessRequest, DeviceWorkflowState.SubWorkflowIdleState, true)]
+        [InlineData(DeviceWorkflowState.SubWorkflowIdleState, DeviceWorkflowState.Manage)]
+        [InlineData(DeviceWorkflowState.SubWorkflowIdleState, DeviceWorkflowState.DeviceRecovery, true)]
         public void GetNextState_ShouldReturnExpectedNextState_When_Called(DeviceWorkflowState currentState, DeviceWorkflowState expectedState, bool exceptionState = false)
         {
             Func<DeviceWorkflowState, bool, DeviceWorkflowState> method = (DeviceWorkflowState state, bool exception)

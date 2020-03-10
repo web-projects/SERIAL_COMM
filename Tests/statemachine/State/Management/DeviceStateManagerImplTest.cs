@@ -1,9 +1,9 @@
-﻿using DEVICE_CORE.Config;
+﻿using Config;
 using DEVICE_CORE.Modules;
-using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Actions.Controllers;
-using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Providers;
+using StateMachine.State.Actions;
+using StateMachine.State.Actions.Controllers;
+using StateMachine.State.Enums;
+using StateMachine.State.Providers;
 using DEVICE_SDK.Sdk;
 using Devices.Common.Interfaces;
 using Moq;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.Management.Tests
+namespace StateMachine.State.Management.Tests
 {
     public class DeviceStateManagerImplTest
     {

@@ -1,11 +1,11 @@
-﻿using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Interfaces;
-using DEVICE_CORE.StateMachine.Tests;
+﻿using StateMachine.State.Enums;
+using StateMachine.State.Interfaces;
+using StateMachine.Tests;
 using Moq;
 using System;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.Actions.Tests
+namespace StateMachine.State.Actions.Tests
 {
     public class DeviceRecoveryStateActionTest : IDisposable
     {

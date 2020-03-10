@@ -1,8 +1,8 @@
-﻿using DEVICE_CORE.Providers;
-using DEVICE_CORE.StateMachine.Cancellation;
+﻿using StateMachine.Providers;
+using StateMachine.Cancellation;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.Providers.Tests
+namespace StateMachine.State.Providers.Tests
 {
     public class DeviceCancellationBrokerProviderImplTests
     {

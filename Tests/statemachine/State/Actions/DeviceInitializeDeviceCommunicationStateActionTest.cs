@@ -1,7 +1,7 @@
-﻿using DEVICE_CORE.Config;
-using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Interfaces;
-using DEVICE_CORE.StateMachine.Tests;
+﻿using Config;
+using StateMachine.State.Enums;
+using StateMachine.State.Interfaces;
+using StateMachine.Tests;
 using DEVICE_SDK.Sdk;
 using Devices.Common;
 using Devices.Common.Helpers;
@@ -13,8 +13,12 @@ using System.Threading.Tasks;
 using XO.Device;
 using XO.Requests;
 using Xunit;
+using TestHelper.Polly;
+using XO.Responses;
+using StateMachine.Cancellation;
+using System.Threading;
 
-namespace DEVICE_CORE.StateMachine.State.Actions.Tests
+namespace StateMachine.State.Actions.Tests
 {
     public class DeviceInitializeDeviceCommunicationStateActionTest : IDisposable
     {
@@ -22,7 +26,7 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 
         readonly LinkRequest linkRequest;
 
-        List<ICardDevice> cardDevices = new List<ICardDevice>();
+        List<ICardDevice> moqCardDevices = new List<ICardDevice>();
         readonly Mock<ICardDevice> fakeDeviceOne = new Mock<ICardDevice>();
         readonly Mock<ICardDevice> fakeDeviceTwo = new Mock<ICardDevice>();
         readonly DeviceInformation deviceInformation;
@@ -30,6 +34,8 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Tests
         //readonly Mock<ILoggingServiceClient> mockLoggingClient;
         readonly Mock<IDeviceStateController> mockController;
         readonly Mock<IDevicePluginLoader> mockDevicePluginLoader;
+
+        readonly Mock<IDeviceCancellationBroker> mockCancellationBroker;
 
         readonly DeviceStateMachineAsyncManager asyncManager;
 
@@ -67,12 +73,15 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 
             //mockLoggingClient = new Mock<ILoggingServiceClient>();
             mockDevicePluginLoader = new Mock<IDevicePluginLoader>();
+            
+            mockCancellationBroker = new Mock<IDeviceCancellationBroker>();
 
             mockController = new Mock<IDeviceStateController>();
             //mockController.SetupGet(e => e.LoggingClient).Returns(mockLoggingClient.Object);
             mockController.SetupGet(e => e.DevicePluginLoader).Returns(mockDevicePluginLoader.Object);
             mockController.SetupGet(e => e.Configuration).Returns(deviceSection);
             mockController.SetupGet(e => e.PluginPath).Returns(pluginPath);
+            mockController.Setup(e => e.GetCancellationBroker()).Returns(mockCancellationBroker.Object);
 
             deviceInformation = new DeviceInformation()
             {
@@ -81,8 +90,8 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Tests
                 SerialNumber = linkRequest.Actions[0].DeviceRequest.DeviceIdentifier.SerialNumber,
             };
             fakeDeviceOne.Setup(e => e.DeviceInformation).Returns(deviceInformation);
-            cardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
-            mockController.SetupGet(e => e.TargetDevices).Returns(cardDevices);
+            moqCardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
+            mockController.SetupGet(e => e.TargetDevices).Returns(moqCardDevices);
 
             subject = new DeviceInitializeDeviceCommunicationStateAction(mockController.Object);
 
@@ -153,6 +162,38 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Tests
 
             //mockController.Verify(e => e.Configuration, Times.Once());
             mockController.Verify(e => e.Complete(subject));
+        }
+
+        [Fact]
+        public async void DoWork_ShouldFailRequest_When_TimeoutPolicyReturnsFailure()
+        {
+            List<ICardDevice> iCardDevices = new List<ICardDevice>()
+            {
+                new Devices.Simulator.DeviceSimulator()
+            };
+            mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(pluginPath)).Returns(iCardDevices);
+
+            DeviceInformation deviceInformation = new DeviceInformation()
+            {
+                Manufacturer = "DeviceMocker",
+                Model = "DeviceMock",
+                SerialNumber = "CEEDEADBEEF"
+            };
+            fakeDeviceOne.Setup(e => e.DeviceInformation).Returns(deviceInformation);
+
+            var timeoutPolicy = PollyPolicyResultGenerator.GetFailurePolicy<List<LinkErrorValue>>(new Exception("Request timed out"));
+
+            mockCancellationBroker.Setup(e => e.ExecuteWithTimeoutAsync(It.IsAny<Func<CancellationToken, List<LinkErrorValue>>>(),
+                It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(timeoutPolicy));
+
+            await subject.DoWork();
+
+            Assert.True(asyncManager.WaitFor());
+
+            //mockLoggingClient.Verify(e => e.LogErrorAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()), Times.Once());
+
+            mockController.Verify(e => e.Error(subject), Times.Once());
+            mockController.Verify(e => e.Complete(subject), Times.Once());
         }
     }
 }

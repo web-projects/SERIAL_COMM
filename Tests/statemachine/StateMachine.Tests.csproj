@@ -13,6 +13,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="State\Actions\Controllers\DeviceStateActionControllerImplTest.cs" />
+    <Compile Include="State\Actions\Controllers\DeviceStateActionSubControllerImplTest.cs" />
+    <Compile Include="State\Actions\DeviceBaseStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceInitializeDeviceCommunicationStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceInitializeDeviceHealthStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceManageStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceNoneStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceRecoveryStateActionTest.cs" />
+    <Compile Include="State\Actions\DeviceShutdownStateActionTest.cs" />
+    <Compile Include="State\Cancellation\DeviceCancellationBrokerImplTests.cs" />
+    <Compile Include="State\DeviceStateTransitionHelperTest.cs" />
+    <Compile Include="State\Management\DeviceStateManagerImplTest.cs" />
+    <Compile Include="State\Providers\DeviceCancellationBrokerProviderImplTests.cs" />
+    <Compile Include="State\Providers\DeviceStateActionControllerProviderTest.cs" />
+    <Compile Include="State\Subworkflows\Actions\DeviceAbortCommandSubStateActionTests.cs" />
+    <Compile Include="State\Subworkflows\Actions\DeviceGetStatusSubStateActionTests.cs" />
+    <Compile Include="State\Subworkflows\Actions\DeviceRequestSubCompleteStateActionTests.cs" />
+    <Compile Include="State\Subworkflows\Actions\DeviceResetCommandSubStateActionTests.cs" />
+    <Compile Include="State\Subworkflows\Actions\DeviceSanityCheckSubStateActionTests.cs" />
+    <Compile Include="State\Subworkflows\DeviceSubStateMachineAsyncManager.cs" />
+    <Compile Include="State\Subworkflows\Management\GenericSubStateManagerImplTests.cs" />
+    <Compile Include="State\TestStubs\StubDeviceStateManager.cs" />
+    <Compile Include="State\TestStubs\StubDeviceSubStateManager.cs" />
+    <Compile Include="State\TestStubs\StubGenericDeviceSubStateManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="Ninject" Version="3.3.4" />
@@ -26,7 +53,6 @@
     <ProjectReference Include="..\..\Source\devices\common\Devices.Common.csproj" />
     <ProjectReference Include="..\..\Source\devices\Simulator\SimulatorDevice.csproj" />
     <ProjectReference Include="..\..\Source\devices\Verifone\Devices.Verifone.csproj" />
-    <ProjectReference Include="..\..\Source\statemachine\StateMachine.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
 

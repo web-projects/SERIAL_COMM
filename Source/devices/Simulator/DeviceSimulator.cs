@@ -10,6 +10,7 @@ using Devices.Common.Interfaces;
 using Devices.Simulator.Connection;
 using Ninject;
 using XO.Requests;
+using XO.Responses;
 
 namespace Devices.Simulator
 {
@@ -89,7 +90,7 @@ namespace Devices.Simulator
             return deviceInformation;
         }
 
-        public void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
+        public List<LinkErrorValue> Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
         {
             DeviceInformation = new DeviceInformation()
             {
@@ -102,6 +103,8 @@ namespace Devices.Simulator
             };
             deviceInfo = DeviceInformation;
             active = IsConnected = serialConnection.Connect(config.SerialConfig.CommPortName);
+
+            return null;
         }
 
         public void DeviceSetIdle()

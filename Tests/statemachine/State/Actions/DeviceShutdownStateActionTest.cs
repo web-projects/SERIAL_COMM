@@ -1,12 +1,11 @@
 ﻿using Moq;
-using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.Interfaces;
+using StateMachine.State.Enums;
+using StateMachine.State.Interfaces;
+using StateMachine.Tests;
 using System;
 using Xunit;
-using DEVICE_CORE.StateMachine.Tests;
 
-namespace DEVICE_CORE.StateMachine.State.Actions.Tests
+namespace StateMachine.State.Actions.Tests
 {
     public class DeviceShutdownStateActionTest : IDisposable
     {

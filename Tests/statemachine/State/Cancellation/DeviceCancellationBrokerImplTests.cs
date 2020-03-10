@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.Cancellation.Tests
+namespace StateMachine.Cancellation.Tests
 {
     public class DeviceCancellationBrokerImplTests
     {

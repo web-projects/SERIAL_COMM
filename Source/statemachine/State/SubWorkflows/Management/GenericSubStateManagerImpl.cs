@@ -32,7 +32,7 @@ namespace StateMachine.State.SubWorkflows.Management
         public DeviceEvent DeviceEvent { get; private set; }
 
         private readonly IDeviceStateController context;
-        private readonly Stack<LinkRequest> savedStackState = new Stack<LinkRequest>();
+        private readonly Stack<object> savedStackState = new Stack<object>();
 
         private Timer globalExecutionTimer;
         private WorkflowOptions launchOptions;
@@ -118,7 +118,7 @@ namespace StateMachine.State.SubWorkflows.Management
             }
         }
 
-        public void SaveState(LinkRequest stateObject) => savedStackState.Push(stateObject);
+        public void SaveState(object stateObject) => savedStackState.Push(stateObject);
 
         public IDeviceCancellationBroker GetDeviceCancellationBroker() => context.GetCancellationBroker();
 

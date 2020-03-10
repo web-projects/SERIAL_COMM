@@ -1,5 +1,5 @@
-﻿using DEVICE_CORE.StateMachine.State.Actions.SubWorkflows.Tests;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using StateMachine.State.Actions.SubWorkflows.Tests;
+using StateMachine.State.Enums;
 using Moq;
 using Ninject;
 using System;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using XO.Requests;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Tests
+namespace StateMachine.State.SubWorkflows.Actions.Tests
 {
     public class DeviceRequestSubCompleteStateActionTests : IDisposable
     {

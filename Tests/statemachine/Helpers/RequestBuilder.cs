@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using XO.Requests;
 
 namespace DEVICE_CORE.Helpers.Tests
 {
     internal static class RequestBuilder
     {
-        /*internal static LinkRequest LinkRequestGetDalStatus() =>
+        internal static LinkRequest LinkRequestGetDeviceStatus() =>
             new LinkRequest()
             {
-                Actions = new List<LinkActionRequest> { BuildLinkGetDalStatusAction() },
+                Actions = new List<LinkActionRequest> { BuildLinkGetDeviceStatusAction() },
                 MessageID = RandomGenerator.BuildRandomString(8),
                 Timeout = 1000
             };
 
-        internal static LinkRequest LinkGetCardDataWorkflowRequest() =>
+        /*internal static LinkRequest LinkGetCardDataWorkflowRequest() =>
             new LinkRequest()
             {
                 Actions = new List<LinkActionRequest> { BuildLinkPaymentRequestAction() },
@@ -58,23 +59,23 @@ namespace DEVICE_CORE.Helpers.Tests
                 Actions = new List<LinkActionRequest> { BuildLinkDebitWorkflow() },
                 MessageID = RandomGenerator.BuildRandomString(8),
                 Timeout = 1000
-            };
+            };*/
 
-        private static LinkActionRequest BuildLinkGetDalStatusAction()
+        private static LinkActionRequest BuildLinkGetDeviceStatusAction()
         {
             var action = new LinkActionRequest
             {
                 MessageID = RandomGenerator.BuildRandomString(8),
                 Action = LinkAction.DALAction,
-                DALActionRequest = new XO.Requests.DAL.LinkDALActionRequest
-                {
-                    DALAction = XO.Requests.DAL.LinkDALActionType.GetStatus
-                }
+                //DeviceActionRequest = new XO.Requests.Device.LinkDeviceActionRequest
+                //{
+                //    DALAction = XO.Requests.Device.LinkDeviceActionType.GetStatus
+                //}
             };
             return action;
         }
 
-        private static LinkActionRequest BuildLinkDebitWorkflow()
+        /*private static LinkActionRequest BuildLinkDebitWorkflow()
         {
             var action = new LinkActionRequest
             {

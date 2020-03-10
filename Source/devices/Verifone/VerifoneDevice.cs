@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using XO.Requests;
+using XO.Responses;
 
 namespace Devices.Verifone
 {
@@ -58,13 +59,15 @@ namespace Devices.Verifone
             return IsConnected;
         }
 
-        public void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
+        public List<LinkErrorValue> Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool active)
         {
             DeviceInformation = deviceInfo;
             DeviceInformation.Manufacturer = ManufacturerConfigID;
             DeviceInformation.ComPort = deviceInfo.ComPort;
 
             active = IsConnected = vipaDevice.Connect(deviceInfo.ComPort, serialConnection);
+
+            return null;
         }
 
         public List<DeviceInformation> DiscoverDevices()

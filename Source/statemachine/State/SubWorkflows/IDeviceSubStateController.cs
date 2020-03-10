@@ -17,7 +17,7 @@ namespace StateMachine.State.SubWorkflows
         List<ICardDevice> TargetDevices { get; }
         bool DidTimeoutOccur { get; }
         public DeviceEvent DeviceEvent { get; }
-        void SaveState(LinkRequest stateObject);
+        void SaveState(object stateObject);
         IDeviceCancellationBroker GetDeviceCancellationBroker();
     }
 }

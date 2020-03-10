@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using XO.Requests;
+using XO.Responses;
 
 namespace Devices.Common.Interfaces
 {
@@ -25,7 +26,7 @@ namespace Devices.Common.Interfaces
 
         List<DeviceInformation> DiscoverDevices();
 
-        void Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool dalActive);
+        List<LinkErrorValue> Probe(DeviceConfig config, DeviceInformation deviceInfo, out bool dalActive);
 
         void DeviceSetIdle();
 

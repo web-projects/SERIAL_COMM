@@ -21,7 +21,7 @@ namespace StateMachine.State.SubWorkflows.Actions
 
         public abstract DeviceSubWorkflowState WorkflowStateType { get; }
 
-        public LinkRequest StateObject { get; private set; }
+        public object StateObject { get; private set; }
 
         public CancellationToken CancellationToken { get; private set; }
 
@@ -46,7 +46,7 @@ namespace StateMachine.State.SubWorkflows.Actions
             return Task.CompletedTask;
         }
 
-        public void SetState(LinkRequest stateObject) => (StateObject) = (stateObject);
+        public void SetState(object stateObject) => (StateObject) = (stateObject);
 
         public void SetCancellationToken(CancellationToken cancellationToken) => (CancellationToken) = (cancellationToken);
 

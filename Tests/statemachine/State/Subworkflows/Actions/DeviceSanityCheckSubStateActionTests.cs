@@ -1,6 +1,6 @@
-﻿using DEVICE_CORE.StateMachine.Cancellation;
-using DEVICE_CORE.StateMachine.State.Actions.SubWorkflows.Tests;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using StateMachine.Cancellation;
+using StateMachine.State.Actions.SubWorkflows.Tests;
+using StateMachine.State.Enums;
 using Devices.Common;
 using Devices.Common.Interfaces;
 using Moq;
@@ -13,7 +13,7 @@ using TestHelper.Polly;
 using XO.Requests;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Tests
+namespace StateMachine.State.SubWorkflows.Actions.Tests
 {
     public class DeviceSanityCheckSubStateActionTests : IDisposable
     {

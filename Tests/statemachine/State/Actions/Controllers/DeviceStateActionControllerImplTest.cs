@@ -1,9 +1,11 @@
-﻿using DEVICE_CORE.StateMachine.State.Enums;
-using DEVICE_CORE.StateMachine.State.TestStubs.Tests;
+﻿using StateMachine.State.Enums;
+using StateMachine.State.Interfaces;
+using StateMachine.State.TestStubs.Tests;
 using System;
+using System.Collections.ObjectModel;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.Actions.Controllers.Tests
+namespace StateMachine.State.Actions.Controllers.Tests
 {
     public class DeviceStateActionControllerImplTest
     {
@@ -20,29 +22,29 @@ namespace DEVICE_CORE.StateMachine.State.Actions.Controllers.Tests
         [InlineData(typeof(DeviceManageStateAction), DeviceWorkflowState.SubWorkflowIdleState)]
         [InlineData(typeof(DeviceProcessRequestStateAction), DeviceWorkflowState.Manage)]
         [InlineData(typeof(DeviceRecoveryStateAction), DeviceWorkflowState.Manage, true, true)]
-        //[InlineData(typeof(DeviceSubWorkflowIdleStateAction), DeviceWorkflowState.ProcessRequest)]
-        //[InlineData(typeof(DeviceSubWorkflowIdleStateAction), DeviceWorkflowState.ProcessRequest, true, true)]
+        [InlineData(typeof(DeviceSubWorkflowIdleStateAction), DeviceWorkflowState.ProcessRequest)]
+        [InlineData(typeof(DeviceSubWorkflowIdleStateAction), DeviceWorkflowState.ProcessRequest, true, true)]
         [InlineData(typeof(DeviceRecoveryStateAction), DeviceWorkflowState.SubWorkflowIdleState, true, true)]
         public void GetNextAction_ShouldReturnCorrectType_When_Called(Type expectedType, DeviceWorkflowState initialState, bool set = true, bool exception = false)
         {
             TestHelper.Helper.SetFieldValueToInstance<IDeviceStateAction>("currentStateAction", false, false, subject, null);
 
-            //if (set)
-            //{
-            //var map = TestHelper.Helper.GetFieldValueFromInstance<ReadOnlyDictionary<DeviceWorkflowState, Func<IDeviceStateController, IDeviceStateAction>>>(
-            //    "workflowMap", false, false, subject);
+            if (set)
+            {
+                var map = TestHelper.Helper.GetFieldValueFromInstance<ReadOnlyDictionary<DeviceWorkflowState, Func<IDeviceStateController, IDeviceStateAction>>>(
+                    "workflowMap", false, false, subject);
 
-            //    IDeviceStateAction action = map[initialState](stubManager);
+                IDeviceStateAction action = map[initialState](stubManager);
 
-            //    if (exception)
-            //    {
-            //        TestHelper.Helper.SetPropertyValueToInstance<StateException>("LastException", true, false, action, new StateException());
-            //    }
+                if (exception)
+                {
+                    TestHelper.Helper.SetPropertyValueToInstance<StateException>("LastException", true, false, action, new StateException());
+                }
 
-            //    TestHelper.Helper.SetFieldValueToInstance<IDeviceStateAction>("currentStateAction", false, false, subject, action);
-            //}
+                TestHelper.Helper.SetFieldValueToInstance<IDeviceStateAction>("currentStateAction", false, false, subject, action);
+            }
 
-            //Assert.IsType(expectedType, subject.GetNextAction(initialState));
+            Assert.IsType(expectedType, subject.GetNextAction(initialState));
         }
     }
 }

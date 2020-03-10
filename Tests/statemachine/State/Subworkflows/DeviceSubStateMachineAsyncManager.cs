@@ -1,9 +1,9 @@
-﻿using DEVICE_CORE.StateMachine.State.SubWorkflows;
-using DEVICE_CORE.StateMachine.State.SubWorkflows.Actions;
+﻿using StateMachine.State.SubWorkflows;
+using StateMachine.State.SubWorkflows.Actions;
 using Moq;
 using System.Threading;
 
-namespace DEVICE_CORE.StateMachine.State.Actions.SubWorkflows.Tests
+namespace StateMachine.State.Actions.SubWorkflows.Tests
 {
     class DeviceSubStateMachineAsyncManager
     {

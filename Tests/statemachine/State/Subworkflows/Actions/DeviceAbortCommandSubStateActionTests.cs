@@ -1,6 +1,6 @@
 ﻿using StateMachine.Cancellation;
-using DEVICE_CORE.StateMachine.State.Actions.SubWorkflows.Tests;
-using DEVICE_CORE.StateMachine.State.Enums;
+using StateMachine.State.Actions.SubWorkflows.Tests;
+using StateMachine.State.Enums;
 using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
@@ -16,7 +16,7 @@ using XO.Device;
 using XO.Requests;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Tests
+namespace StateMachine.State.SubWorkflows.Actions.Tests
 {
     public class DeviceAbortCommandSubStateActionTests : IDisposable
     {

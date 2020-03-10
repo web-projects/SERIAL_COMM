@@ -1,14 +1,14 @@
 ﻿using Core.Patterns.Queuing;
-using DEVICE_CORE.Config;
-using DEVICE_CORE.SerialPort.Interfaces;
-using DEVICE_CORE.StateMachine.State.Interfaces;
-using DEVICE_CORE.StateMachine.State.Providers;
-using DEVICE_CORE.StateMachine.State.SubWorkflows.Management;
-using DEVICE_CORE.StateMachine.Cancellation;
-using DEVICE_CORE.StateMachine.State;
-using DEVICE_CORE.StateMachine.State.Actions;
-using DEVICE_CORE.StateMachine.State.Actions.Preprocessing;
-using DEVICE_CORE.StateMachine.State.Management;
+using Config;
+using StateMachine.SerialPort.Interfaces;
+using StateMachine.State.Interfaces;
+using StateMachine.State.Providers;
+using StateMachine.State.SubWorkflows.Management;
+using StateMachine.Cancellation;
+using StateMachine.State;
+using StateMachine.State.Actions;
+using StateMachine.State.Actions.Preprocessing;
+using StateMachine.State.Management;
 using DEVICE_SDK.Sdk;
 using Devices.Common;
 using Devices.Common.Interfaces;
@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DEVICE_CORE.StateMachine.State.TestStubs.Tests
+namespace StateMachine.State.TestStubs.Tests
 {
     internal class StubDeviceStateManager : IDeviceStateManager, IDeviceStateController
     {

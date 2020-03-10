@@ -1,6 +1,6 @@
-﻿using DEVICE_CORE.StateMachine.Cancellation;
-using DEVICE_CORE.StateMachine.State.Actions.SubWorkflows.Tests;
-using DEVICE_CORE.StateMachine.State.Enums;
+﻿using StateMachine.Cancellation;
+using StateMachine.State.Actions.SubWorkflows.Tests;
+using StateMachine.State.Enums;
 using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
@@ -16,7 +16,7 @@ using XO.Device;
 using XO.Requests;
 using Xunit;
 
-namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Tests
+namespace StateMachine.State.SubWorkflows.Actions.Tests
 {
     public class DeviceResetCommandSubStateActionTests : IDisposable
     {
@@ -307,17 +307,6 @@ namespace DEVICE_CORE.StateMachine.State.SubWorkflows.Actions.Tests
             Assert.True(asyncManager.WaitFor());
 
             //mockLoggingClient.Verify(e => e.LogErrorAsync(string.Format($"Unable to obtain device information from request - '{DeviceDiscovery.NoDeviceSpecified}'."),
-            //    It.IsAny<Dictionary<string, object>>()), Times.Once());
-        }
-
-        [Fact]
-        public async void DoWork_ShouldFailWhenCardDeviceNotFound_WhenCalled()
-        {
-            await subject.DoWork();
-
-            Assert.True(asyncManager.WaitFor());
-
-            //mockLoggingClient.Verify(e => e.LogErrorAsync(string.Format($"Unable to obtain device information from request - '{DeviceDiscovery.NoDeviceMatched}'."),
             //    It.IsAny<Dictionary<string, object>>()), Times.Once());
         }
 

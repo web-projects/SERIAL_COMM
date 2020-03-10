@@ -15,7 +15,7 @@ namespace StateMachine.State.SubWorkflows.Actions
         DeviceSubWorkflowState WorkflowStateType { get; }
         CancellationToken CancellationToken { get; }
         SubStateActionLaunchRules LaunchRules { get; }
-        void SetState(LinkRequest stateObject);
+        void SetState(object stateObject);
         void SetCancellationToken(CancellationToken cancellationToken);
         Task DoWork();
     }
