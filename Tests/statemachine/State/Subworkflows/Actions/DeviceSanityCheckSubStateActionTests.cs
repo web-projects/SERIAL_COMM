@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using TestHelper.Polly;
 using XO.Requests;
 using Xunit;
+using XO.Device;
+using DEVICE_CORE.Helpers.Tests;
 
 namespace StateMachine.State.SubWorkflows.Actions.Tests
 {
@@ -37,23 +39,23 @@ namespace StateMachine.State.SubWorkflows.Actions.Tests
                 //{
                 //    LinkActionResponseList = new List<XO.Responses.LinkActionResponse>()
                 //},
-                //Actions = new List<LinkActionRequest>()
-                //{
-                //    new LinkActionRequest()
-                //    {
-                //        MessageID = Helpers.RandomGenerator.BuildRandomString(8),
-                //        Timeout = 10000,
-                //        DeviceRequest = new LinkDeviceRequest()
-                //        {
-                //            DeviceIdentifier = new LinkDeviceIdentifier()
-                //            {
-                //                Manufacturer = "DeviceMockerInc",
-                //                Model = "DeviceMokerModel",
-                //                SerialNumber = "CEEEDEADBEEF"
-                //            }
-                //        }
-                //    }
-                //}
+                Actions = new List<LinkActionRequest>()
+                {
+                    new LinkActionRequest()
+                    {
+                        MessageID = RandomGenerator.BuildRandomString(8),
+                        Timeout = 10000,
+                        DeviceRequest = new LinkDeviceRequest()
+                        {
+                            DeviceIdentifier = new LinkDeviceIdentifier()
+                            {
+                                Manufacturer = "DeviceMockerInc",
+                                Model = "DeviceMokerModel",
+                                SerialNumber = "CEEEDEADBEEF"
+                            }
+                        }
+                    }
+                }
             };
             //linkRequest.LinkObjects = SampleBuilder.LinkObjectsForEvents();
             //linkRequest.LinkObjects.LinkActionResponseList[0].MessageID = "Authentication";
@@ -118,12 +120,31 @@ namespace StateMachine.State.SubWorkflows.Actions.Tests
         [Fact]
         public async void DoWork_ShouldFailRequest_When_TimeoutPolicyReturnsFailure()
         {
+            DeviceInformation deviceInformation = new DeviceInformation()
+            {
+                Manufacturer = "DeviceMockerInc",
+                Model = "DeviceMokerModel",
+                SerialNumber = "CEEEDEADBEEF"
+
+            };
+            List<ICardDevice> cardDevices = new List<ICardDevice>();
+            Mock<ICardDevice> fakeDeviceOne = new Mock<ICardDevice>();
+            Mock<ICardDevice> fakeDeviceTwo = new Mock<ICardDevice>();
+            fakeDeviceTwo.Setup(e => e.DeviceInformation).Returns(deviceInformation);
+            cardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
+
+            mockSubController.SetupGet(e => e.TargetDevices).Returns(cardDevices);
+
             var timeoutPolicy = PollyPolicyResultGenerator.GetFailurePolicy<bool>(new Exception("Request timed out"));
 
             mockDeviceCancellationBroker.Setup(e => e.ExecuteWithTimeoutAsync(It.IsAny<Func<CancellationToken, bool>>(),
                 It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(timeoutPolicy));
 
             mockSubController.Setup(e => e.DidTimeoutOccur).Returns(true);
+
+            linkRequest.Actions[0].Action = LinkAction.DALAction;
+            subject.SetState(linkRequest);
+
             await subject.DoWork();
 
             Assert.True(asyncManager.WaitFor());

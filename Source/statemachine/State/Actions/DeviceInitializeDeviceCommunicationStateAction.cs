@@ -108,11 +108,10 @@ namespace StateMachine.State.Actions
                             if (timeoutPolicy.Result.Outcome == Polly.OutcomeType.Failure)
                             {
                                 Console.WriteLine($"Unable to obtain device status for - '{device.Name}'.");
-                                validatedCardDevices[i].DeviceEventOccured -= Controller.DeviceEventReceived;
+                                device.DeviceEventOccured -= Controller.DeviceEventReceived;
                                 device?.Dispose();
                                 LastException = new StateException("Unable to find a valid device to connect to.");
                                 _ = Error(this);
-                                _ = Complete(this);
                                 return Task.CompletedTask;
                             }
                             else if (success)
@@ -175,6 +174,7 @@ namespace StateMachine.State.Actions
                 Console.WriteLine("Unable to find a valid device to connect to.");
                 LastException = new StateException("Unable to find a valid device to connect to.");
                 _ = Error(this);
+                return Task.CompletedTask;
             }
 
             _ = Complete(this);

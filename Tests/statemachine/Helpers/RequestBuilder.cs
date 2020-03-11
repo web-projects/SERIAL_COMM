@@ -67,10 +67,10 @@ namespace DEVICE_CORE.Helpers.Tests
             {
                 MessageID = RandomGenerator.BuildRandomString(8),
                 Action = LinkAction.DALAction,
-                //DeviceActionRequest = new XO.Requests.Device.LinkDeviceActionRequest
-                //{
-                //    DALAction = XO.Requests.Device.LinkDeviceActionType.GetStatus
-                //}
+                DeviceActionRequest = new LinkDeviceActionRequest
+                {
+                    DeviceAction = LinkDeviceActionType.GetStatus
+                }
             };
             return action;
         }

@@ -90,6 +90,8 @@ namespace StateMachine.State.Actions.Tests
                 SerialNumber = linkRequest.Actions[0].DeviceRequest.DeviceIdentifier.SerialNumber,
             };
             fakeDeviceOne.Setup(e => e.DeviceInformation).Returns(deviceInformation);
+            deviceInformation.SerialNumber = "CEEEBEEFDEAD";
+            fakeDeviceTwo.Setup(e => e.DeviceInformation).Returns(deviceInformation);
             moqCardDevices.AddRange(new ICardDevice[] { fakeDeviceOne.Object, fakeDeviceTwo.Object });
             mockController.SetupGet(e => e.TargetDevices).Returns(moqCardDevices);
 
@@ -130,8 +132,6 @@ namespace StateMachine.State.Actions.Tests
         [Fact]
         public void DoWork_ShouldComplete_When_NoDeviceIsSpecified()
         {
-            //mockController.SetupGet(e => e.TargetDevice).Returns(new NoDevice.NoDevice());
-
             Assert.Equal(subject.DoWork(), Task.CompletedTask);
             Assert.True(asyncManager.WaitFor());
 
@@ -143,7 +143,6 @@ namespace StateMachine.State.Actions.Tests
         public void DoWork_ShouldProbeAllFoundDevices_When_Called()
         {
             bool dalActive = true;
-            //mockCardDevice.Setup(e => e.Probe(It.IsAny<DeviceConfig>(), It.IsAny<DeviceInformation>(), out dalActive));
 
             List<ICardDevice> iCardDevices = new List<ICardDevice>()
             {
@@ -156,11 +155,6 @@ namespace StateMachine.State.Actions.Tests
 
             mockDevicePluginLoader.Verify(e => e.FindAvailableDevices(pluginPath), Times.Once());
 
-            //mockController.Verify(e => e.SetTargetDevice(It.IsAny<ICardDevice>()), Times.Once());
-            //mockController.Verify(e => e.SetTargetDevice(It.IsAny<NoDevice.NoDevice>()), Times.Once());
-            //mockCardDevice.Verify(e => e.DeviceSetIdle(), Times.Once());
-
-            //mockController.Verify(e => e.Configuration, Times.Once());
             mockController.Verify(e => e.Complete(subject));
         }
 
@@ -170,6 +164,9 @@ namespace StateMachine.State.Actions.Tests
             List<ICardDevice> iCardDevices = new List<ICardDevice>()
             {
                 new Devices.Simulator.DeviceSimulator()
+                {
+                    SortOrder = 1
+                }
             };
             mockDevicePluginLoader.Setup(e => e.FindAvailableDevices(pluginPath)).Returns(iCardDevices);
 
@@ -180,6 +177,10 @@ namespace StateMachine.State.Actions.Tests
                 SerialNumber = "CEEDEADBEEF"
             };
             fakeDeviceOne.Setup(e => e.DeviceInformation).Returns(deviceInformation);
+
+            DeviceSection deviceSection = new DeviceSection();
+            deviceSection.Simulator.SortOrder = 1;
+            mockController.Setup(e => e.Configuration).Returns(deviceSection);
 
             var timeoutPolicy = PollyPolicyResultGenerator.GetFailurePolicy<List<LinkErrorValue>>(new Exception("Request timed out"));
 
@@ -193,7 +194,6 @@ namespace StateMachine.State.Actions.Tests
             //mockLoggingClient.Verify(e => e.LogErrorAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()), Times.Once());
 
             mockController.Verify(e => e.Error(subject), Times.Once());
-            mockController.Verify(e => e.Complete(subject), Times.Once());
         }
     }
 }
