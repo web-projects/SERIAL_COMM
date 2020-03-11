@@ -118,8 +118,6 @@ namespace StateMachine.State.Actions
                             {
                                 discoveredCardDevices.Add(device);
                             }
-
-
                         }
                     }
                     catch(Exception e)

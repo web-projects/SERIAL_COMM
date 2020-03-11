@@ -48,3 +48,4 @@ This an applicationto test Serial Communication.
 * 20200308 - Cleaned up tests.
 * 20200309 - Removed unneeded code.
 * 20200310 - Cleaned up more tests.
+* 20200311 - Some refinement work.

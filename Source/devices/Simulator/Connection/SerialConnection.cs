@@ -112,19 +112,22 @@ namespace Devices.Simulator.Connection
                 // open serial port
                 serialPort.Open();
 
-                // monitor port changes
-                //PortsChanged += OnPortsChanged;
-                lastCDHolding = serialPort.CDHolding;
+                connected = serialPort.IsOpen;
 
-                // discard any buffered bytes
-                serialPort.DiscardInBuffer();
-                serialPort.DiscardOutBuffer();
+                if (connected)
+                {
+                    // monitor port changes
+                    //PortsChanged += OnPortsChanged;
+                    lastCDHolding = serialPort.CDHolding;
 
-                ResponseBytesHandler += ReadResponses;
+                    // discard any buffered bytes
+                    serialPort.DiscardInBuffer();
+                    serialPort.DiscardOutBuffer();
 
-                readThread.Start();
+                    ResponseBytesHandler += ReadResponses;
 
-               connected = true;
+                    readThread.Start();
+                }
             }
             catch (Exception e)
             {

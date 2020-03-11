@@ -61,7 +61,7 @@ namespace Core.Patterns.Tests.Queueing
             sw.Stop();
 
             Assert.True(testQueue.Count() == 0);
-            Assert.True(sw.ElapsedMilliseconds < 600);
+            Assert.True(sw.ElapsedMilliseconds < 1000);
         }
 
         [Theory]
