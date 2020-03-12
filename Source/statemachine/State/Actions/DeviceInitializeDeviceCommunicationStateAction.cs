@@ -80,6 +80,11 @@ namespace StateMachine.State.Actions
                     {
                         List<DeviceInformation> deviceInformation = discoveredCardDevices[i].DiscoverDevices();
 
+                        if (deviceInformation == null)
+                        {
+                            continue;
+                        }
+
                         foreach (var deviceInfo in deviceInformation)
                         {
                             DeviceConfig deviceConfig = new DeviceConfig()

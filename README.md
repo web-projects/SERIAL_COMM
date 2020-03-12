@@ -49,3 +49,4 @@ This an applicationto test Serial Communication.
 * 20200309 - Removed unneeded code.
 * 20200310 - Cleaned up more tests.
 * 20200311 - Some refinement work.
+* 20200312 - Fixed check for null.
