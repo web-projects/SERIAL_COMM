@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
+using System.Reflection;
 using System.Threading;
 
 namespace Devices.Simulator.Connection
@@ -142,6 +144,24 @@ namespace Devices.Simulator.Connection
             return connected;
         }
 
+        public bool Connected()
+        {
+            try
+            {
+                if (lastCDHolding != serialPort?.CDHolding)
+                {
+                    connected = false;
+                    Dispose();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
+            }
+
+            return connected;
+        }
+
         public void Disconnect(bool exposeExceptions = false)
         {
             if (serialPort?.IsOpen ?? false)
@@ -170,24 +190,6 @@ namespace Devices.Simulator.Connection
             }
         }
 
-        public bool Connected()
-        {
-            try
-            {
-                if (lastCDHolding != serialPort?.CDHolding)
-                {
-                    connected = false;
-                    Dispose();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"SerialConnection: exception=[{e.Message}]");
-            }
-
-            return connected;
-        }
-
         public void Dispose()
         {
             try
@@ -204,6 +206,11 @@ namespace Devices.Simulator.Connection
 
         protected virtual void Dispose(bool disposing)
         {
+            Stream internalSerialStream = (Stream)serialPort.GetType()
+                .GetField("internalSerialStream", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(serialPort);
+
+            GC.SuppressFinalize(serialPort);
+            GC.SuppressFinalize(internalSerialStream);
             GC.SuppressFinalize(this);
         }
 

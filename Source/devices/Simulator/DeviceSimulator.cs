@@ -65,7 +65,7 @@ namespace Devices.Simulator
 
         public void Dispose()
         {
-
+            serialConnection?.Dispose();
         }
 
         bool ICardDevice.IsConnected(object request)

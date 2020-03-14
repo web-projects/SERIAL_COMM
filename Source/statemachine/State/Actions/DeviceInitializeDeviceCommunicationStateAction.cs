@@ -31,6 +31,7 @@ namespace StateMachine.State.Actions
             {
                 availableCardDevices = discoveredCardDevices = Controller.DevicePluginLoader.FindAvailableDevices(pluginPath);
 
+                // filter out devices that are disabled
                 if (discoveredCardDevices.Count > 0)
                 {
                     DeviceSection deviceSection = Controller.Configuration;
@@ -151,13 +152,14 @@ namespace StateMachine.State.Actions
                 availableCardDevices = new List<ICardDevice>();
             }
 
-            if (validatedCardDevices?.Count > 0)
+            if (discoveredCardDevices?.Count > 1)
             {
-                Controller.SetTargetDevices(validatedCardDevices);
+                discoveredCardDevices.Sort();
             }
-            else
+
+            if (discoveredCardDevices?.Count > 0)
             {
-                Controller.SetTargetDevices(null);
+                Controller.SetTargetDevices(discoveredCardDevices);
             }
 
             if (Controller.TargetDevices != null)

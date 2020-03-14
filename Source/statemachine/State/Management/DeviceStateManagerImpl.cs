@@ -19,6 +19,7 @@ using StateMachine.State.SubWorkflows;
 using StateMachine.State.SubWorkflows.Management;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using XO.Requests;
 
@@ -195,8 +196,11 @@ namespace StateMachine.State.Management
 
         private void OnComPortEventReceived(PortEventType comPortEvent, string portNumber)
         {
+            bool peformDeviceDiscovery = false;
+
             if (comPortEvent == PortEventType.Insertion)
             {
+                peformDeviceDiscovery = true;
                 //_ = LoggingClient.LogInfoAsync($"Comport Plugged. ComportNumber '{portNumber}'. Detecting a new connection...");
                 Console.WriteLine($"Comport Plugged. ComportNumber '{portNumber}'. Detecting a new connection...");
             }
@@ -204,17 +208,24 @@ namespace StateMachine.State.Management
             {
                 if (TargetDevices != null)
                 {
-                    // dispose of all connections so that device recovery re-validates them
-                    foreach (var device in TargetDevices)
+                    // dispose of all existing connections so that device recovery re-validates them
+                    var deviceDisconnected = TargetDevices.Where(a => a.DeviceInformation.ComPort.Equals(portNumber, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                    if (deviceDisconnected != null)
                     {
-                        if (string.Equals(portNumber, device.DeviceInformation.ComPort, StringComparison.CurrentCultureIgnoreCase))
+                        peformDeviceDiscovery = true;
+
+                        // dispose of all connections so that device recovery re-validates them
+                        foreach (var device in TargetDevices)
                         {
-                            //_ = LoggingClient.LogInfoAsync($"Comport unplugged. ComportNumber '{portNumber}', " +
-                            //    $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
-                            Console.WriteLine($"Comport unplugged. ComportNumber '{portNumber}', " +
-                                $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
+                            if (string.Equals(portNumber, device.DeviceInformation.ComPort, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                //_ = LoggingClient.LogInfoAsync($"Comport unplugged. ComportNumber '{portNumber}', " +
+                                //    $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
+                                Console.WriteLine($"Comport unplugged. ComportNumber '{portNumber}', " +
+                                    $"DeviceType '{device.ManufacturerConfigID}', SerialNumber '{device.DeviceInformation?.SerialNumber}'");
+                            }
+                            device.Dispose();
                         }
-                        device.Dispose();
                     }
                 }
                 //else
@@ -232,21 +243,25 @@ namespace StateMachine.State.Management
                 Console.WriteLine($"Comport Event '{comPortEvent}' is not implemented ");
             }
 
-            //LoggingClient.LogInfoAsync($"Device recovery in progress...");
-            Console.WriteLine($"Device recovery in progress...");
-
-            if (currentStateAction.WorkflowStateType == DeviceWorkflowState.Manage)
+            // only perform discovery when an existing device is disconnected or a new connection is detected
+            if (peformDeviceDiscovery)
             {
-                currentStateAction.DoDeviceDiscovery();
-            }
-            else
-            {
-                StateActionRules.NeedsDeviceRecovery = true;
+                //LoggingClient.LogInfoAsync($"Device recovery in progress...");
+                Console.WriteLine($"Device recovery in progress...");
 
-                if (subStateController != null)
+                if (currentStateAction.WorkflowStateType == DeviceWorkflowState.Manage)
                 {
-                    IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
-                    subStateManager.ComportEventReceived(comPortEvent, portNumber);
+                    currentStateAction.DoDeviceDiscovery();
+                }
+                else
+                {
+                    StateActionRules.NeedsDeviceRecovery = true;
+
+                    if (subStateController != null)
+                    {
+                        IDeviceSubStateManager subStateManager = subStateController as IDeviceSubStateManager;
+                        subStateManager.ComportEventReceived(comPortEvent, portNumber);
+                    }
                 }
             }
         }

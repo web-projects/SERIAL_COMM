@@ -50,3 +50,4 @@ This an applicationto test Serial Communication.
 * 20200310 - Cleaned up more tests.
 * 20200311 - Some refinement work.
 * 20200312 - Fixed check for null.
+* 20200313 - Fixed Com Port Close.
