@@ -227,10 +227,10 @@ namespace Devices.Verifone.VIPA
                     };
                     deviceIdentifier?.TrySetResult((deviceInfoObject, responseCode));
                 }
-                else
-                {
-                    deviceIdentifier?.TrySetResult((null, responseCode));
-                }
+                //else
+                //{
+                //    deviceIdentifier?.TrySetResult((null, responseCode));
+                //}
             }
         }
         #endregion --- response handlers ---

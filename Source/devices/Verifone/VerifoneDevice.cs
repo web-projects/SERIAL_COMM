@@ -2,6 +2,7 @@
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
 using Devices.Verifone.Connection;
+using Devices.Verifone.Helpers;
 using Devices.Verifone.VIPA;
 using Ninject;
 using System;
@@ -65,8 +66,33 @@ namespace Devices.Verifone
             DeviceInformation.Manufacturer = ManufacturerConfigID;
             DeviceInformation.ComPort = deviceInfo.ComPort;
 
+            serialConnection = new SerialConnection();
             active = IsConnected = vipaDevice.Connect(deviceInfo.ComPort, serialConnection);
+            if (active)
+            {
+                (DeviceInfoObject deviceInfoObject, int VipaResponse) deviceIdentifier = vipaDevice.DeviceCommandReset();
 
+                if (deviceIdentifier.VipaResponse == (int)VipaSW1SW2Codes.Success)
+                {
+                    //DeviceInformation = deviceInformation;
+
+                    if (DeviceInformation != null)
+                    {
+                        DeviceInformation.Manufacturer = ManufacturerConfigID;
+                        //DeviceInformation.Model = deviceIdentifier.deviceInfoObject.linkDeviceResponse.Model;
+                    }
+                    vipaDevice = vipaDevice;
+                    //_config = config;
+                    active = true;
+
+                    Console.WriteLine($"DEVICE PROBE SUCCESS ON COM: {DeviceInformation?.ComPort} FOR SN: {DeviceInformation?.SerialNumber}");
+                }
+                else
+                {
+                    //vipaDevice.CancelResponseHandlers();
+                    Console.WriteLine($"DEVICE PROBE FAILED ON COM: {DeviceInformation?.ComPort}");
+                }
+            }
             return null;
         }
 

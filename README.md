@@ -51,3 +51,4 @@ This an applicationto test Serial Communication.
 * 20200311 - Some refinement work.
 * 20200312 - Fixed check for null.
 * 20200313 - Fixed Com Port Close.
+* 20200406 - Fixed Verifone connection bug.

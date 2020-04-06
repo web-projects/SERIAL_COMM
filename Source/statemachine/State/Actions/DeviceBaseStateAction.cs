@@ -1,8 +1,8 @@
-﻿using StateMachine.State.Enums;
-using StateMachine.State.Interfaces;
-using Devices.Common;
+﻿using Devices.Common;
 using Devices.Common.Helpers;
 using Devices.Common.Interfaces;
+using StateMachine.State.Enums;
+using StateMachine.State.Interfaces;
 using System;
 using System.Threading.Tasks;
 using XO.Device;
@@ -31,6 +31,13 @@ namespace StateMachine.State.Actions
         {
             if (Controller != null)
             {
+                if (Controller.TargetDevices != null)
+                {
+                    foreach (var device in Controller.TargetDevices)
+                    {
+                        device.Dispose();
+                    }
+                }
                 Controller.RequestReceived -= RequestReceived;
                 Controller.DeviceEventReceived -= DeviceEventReceived;
                 Controller.ComPortEventReceived -= ComportEventReceived;

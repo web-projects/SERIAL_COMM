@@ -29,13 +29,13 @@ namespace StateMachine.State.Actions
 
             try
             {
-                availableCardDevices = discoveredCardDevices = Controller.DevicePluginLoader.FindAvailableDevices(pluginPath);
+                availableCardDevices = Controller.DevicePluginLoader.FindAvailableDevices(pluginPath);
 
                 // filter out devices that are disabled
-                if (discoveredCardDevices.Count > 0)
+                if (availableCardDevices.Count > 0)
                 {
                     DeviceSection deviceSection = Controller.Configuration;
-                    foreach (var device in discoveredCardDevices)
+                    foreach (var device in availableCardDevices)
                     {
                         switch (device.ManufacturerConfigID)
                         {
@@ -58,20 +58,22 @@ namespace StateMachine.State.Actions
                             }
                         }
                     }
-                    discoveredCardDevices.RemoveAll(x => x.SortOrder == -1);
+                    availableCardDevices.RemoveAll(x => x.SortOrder == -1);
 
-                    if (discoveredCardDevices?.Count > 1)
+                    if (availableCardDevices?.Count > 1)
                     {
-                        discoveredCardDevices.Sort();
+                        availableCardDevices.Sort();
                     }
                 }
 
                 // Probe validated devices
+                discoveredCardDevices = new List<ICardDevice>();
                 validatedCardDevices = new List<ICardDevice>();
+                validatedCardDevices.AddRange(availableCardDevices);
 
-                for (int i = discoveredCardDevices.Count - 1; i >= 0; i--)
+                for (int i = validatedCardDevices.Count - 1; i >= 0; i--)
                 {
-                    if (string.Equals(discoveredCardDevices[i].ManufacturerConfigID, DeviceType.NoDevice.ToString(), StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(availableCardDevices[i].ManufacturerConfigID, DeviceType.NoDevice.ToString(), StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -79,7 +81,7 @@ namespace StateMachine.State.Actions
                     bool success = false;
                     try
                     {
-                        List<DeviceInformation> deviceInformation = discoveredCardDevices[i].DiscoverDevices();
+                        List<DeviceInformation> deviceInformation = availableCardDevices[i].DiscoverDevices();
 
                         if (deviceInformation == null)
                         {
@@ -98,7 +100,7 @@ namespace StateMachine.State.Actions
                             };
                             deviceConfig.SetSerialDeviceConfig(serialConfig);
 
-                            ICardDevice device = discoveredCardDevices[i].Clone() as ICardDevice;
+                            ICardDevice device = validatedCardDevices[i].Clone() as ICardDevice;
 
                             device.DeviceEventOccured += Controller.DeviceEventReceived;
  
@@ -168,8 +170,8 @@ namespace StateMachine.State.Actions
                 {
                     //Controller.LoggingClient.LogInfoAsync($"Device found: name='{device.Name}', model={device.DeviceInformation.Model}, " +
                     //    $"serial={device.DeviceInformation.SerialNumber}");
-                    Console.WriteLine($"Device found: name='{device.Name}', model='{device.DeviceInformation.Model}', " +
-                        $"serial='{device.DeviceInformation.SerialNumber}'");
+                    Console.WriteLine($"Device found: name='{device.Name}', model='{device?.DeviceInformation?.Model}', " +
+                        $"serial='{device?.DeviceInformation?.SerialNumber}'");
                     device.DeviceSetIdle();
                 }
             }
